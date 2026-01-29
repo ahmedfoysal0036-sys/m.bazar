@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M.Bazar - Created by Ahmed Faisal</title>
+    <style>
+        :root {
+            --primary-cyan: #00bcd4;
+            --dark-cyan: #0097a7;
+            --soft-cyan: #e0f7fa;
+            --bg-white: #ffffff;
+            --text-main: #37474f;
+            --shadow: 0 10px 30px rgba(0, 188, 212, 0.1);
+        }
+
+        /* Dim to Light Up Animation */
+        @keyframes lightUp {
+            from { opacity: 0; filter: brightness(0.5); }
+            to { opacity: 1; filter: brightness(1); }
+        }
+
+        /* Sunrise Greeting Animation */
+        @keyframes sunrise {
+            0% { transform: translateY(50px); opacity: 0; color: #ff9800; }
+            50% { color: var(--primary-cyan); }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: #f0fafa;
+            margin: 0; padding: 0;
+            color: var(--text-main);
+            animation: lightUp 1.5s ease-out;
+        }
+
+        .container { max-width: 550px; margin: auto; padding: 20px; }
+
+        .greeting-box {
+            text-align: center;
+            padding: 20px 0;
+            animation: sunrise 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .greeting-box h2 { margin: 0; font-size: 22px; color: var(--dark-cyan); }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-cyan), var(--dark-cyan));
+            color: white; padding: 40px 20px;
+            border-radius: 30px; text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 151, 167, 0.3);
+            position: relative; z-index: 2;
+        }
+
+        .header h1 { margin: 0; font-size: 34px; font-weight: 800; letter-spacing: 2px; }
+        .creator-tag { font-size: 11px; opacity: 0.9; margin-top: 5px; letter-spacing: 1px; }
+
+        .main-card {
+            background: var(--bg-white);
+            border-radius: 35px; padding: 45px 15px 25px;
+            margin-top: -35px; box-shadow: var(--shadow);
+        }
+
+        .filters { display: flex; gap: 12px; margin-bottom: 25px; }
+        .filters select, .filters input {
+            flex: 1; padding: 12px; border-radius: 15px;
+            border: 1px solid var(--soft-cyan); background: #fdfdfd;
+            font-weight: 600; outline-color: var(--primary-cyan);
+        }
+
+        .item-row {
+            display: grid; grid-template-columns: 2.2fr 1fr 1fr 1.2fr;
+            gap: 10px; background: #fff; padding: 14px;
+            border-radius: 20px; margin-bottom: 12px;
+            border: 1.5px solid #f1f1f1; align-items: center;
+            transition: 0.3s;
+        }
+        .item-row:hover { border-color: var(--primary-cyan); transform: translateY(-3px); }
+
+        .item-info { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+        
+        input[type="number"], select {
+            width: 100%; padding: 8px; border: 1px solid #eee;
+            border-radius: 10px; text-align: center; font-size: 13px;
+        }
+
+        .row-total { text-align: right; font-weight: 800; color: var(--dark-cyan); }
+
+        .total-panel {
+            background: #263238; color: white; padding: 25px;
+            border-radius: 25px; display: flex; justify-content: space-between;
+            align-items: center; margin-top: 25px;
+        }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .btn {
+            border: none; padding: 16px; border-radius: 18px; cursor: pointer;
+            font-weight: 700; transition: 0.3s;
+        }
+        .btn-add { background: var(--soft-cyan); color: var(--dark-cyan); }
+        .btn-save { background: #e3f2fd; color: #1565c0; }
+
+        @media (max-width: 480px) {
+            .item-row { grid-template-columns: 1.5fr 1fr 1fr; }
+            .row-total { grid-column: span 3; text-align: right; border-top: 1px solid #f5f5f5; padding-top: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="greeting-box">
+        <h2>Welcome Master Ahmed Faisal</h2>
+    </div>
+
+    <div class="header">
+        <h1>M.Bazar</h1>
+        <div class="creator-tag">created by Ahmed Faisal</div>
+    </div>
+
+    <div class="main-card">
+        <div class="filters">
+            <select id="selMonth" onchange="initApp()">
+                <option value="January">January</option><option value="February">February</option>
+                <option value="March">March</option><option value="April">April</option>
+                <option value="May">May</option><option value="June">June</option>
+                <option value="July">July</option><option value="August">August</option>
+                <option value="September">September</option><option value="October">October</option>
+                <option value="November">November</option><option value="December">December</option>
+            </select>
+            <input type="number" id="selYear" value="2026" onchange="initApp()">
+        </div>
+
+        <div id="itemList"></div>
+
+        <div class="btn-group">
+            <button class="btn btn-add" onclick="addNew()">✨ Add New Item</button>
+            <button class="btn btn-save" onclick="exportData()">📊 Download Report</button>
+        </div>
+
+        <div class="total-panel">
+            <div style="font-size: 14px; opacity: 0.8;">Estimated Total</div>
+            <div id="grandTotal" style="font-size: 26px; font-weight: 800; color: #4dd0e1;">৳ 0</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Logic remains clean to prevent input jumping
+    const iconMap = {
+        "Rice": "🍚", "Oil": "💧", "Milk": "🥛", "Egg": "🥚", "Fish": "🐟", "Meat": "🍗",
+        "Beef": "🥩", "Chicken": "🐔", "WiFi": "📶", "Fuel": "⛽", "Tuition": "🎓",
+        "Salt": "🧂", "Potato": "🥔", "Soap": "🧼", "Tea": "☕", "Sugar": "🍬"
+    };
+
+    function getIcon(name) {
+        for (let key in iconMap) { if (name.toLowerCase().includes(key.toLowerCase())) return iconMap[key]; }
+        return "🛒";
+    }
+
+    const defaultItems = [
+        "Beef (Goru)", "Bike Fuel", "Chicken (Murgi)", "Eggs (Dim)", "Fish (Rui/Ilish)", 
+        "Lentils (Daal)", "Milk (Dudh)", "Oil (Soybean)", "Onion (Peyaj)", "Potato (Alu)", 
+        "Rice (Chaal)", "Salt (Lobon)", "Utility Bills", "WiFi Bill"
+    ];
+
+    let dataStore = JSON.parse(localStorage.getItem('M-Bazar-Cyan-v1')) || {};
+
+    function initApp() {
+        const key = `${document.getElementById('selMonth').value}-${document.getElementById('selYear').value}`;
+        if (!dataStore[key]) {
+            dataStore[key] = defaultItems.map(name => ({ n: name, p: 0, q: 1, u: "kg" }));
+            dataStore[key].sort((a, b) => a.n.localeCompare(b.n));
+        }
+        render();
+    }
+
+    function render() {
+        const key = `${document.getElementById('selMonth').value}-${document.getElementById('selYear').value}`;
+        const container = document.getElementById('itemList');
+        let html = '';
+        let total = 0;
+
+        dataStore[key].forEach((item, idx) => {
+            let rowTotal = item.p * item.q;
+            total += rowTotal;
+            html += `
+                <div class="item-row">
+                    <div class="item-info">
+                        <span style="font-size:20px">${getIcon(item.n)}</span>
+                        <span style="font-size:14px">${item.n}</span>
+                    </div>
+                    <input type="number" value="${item.p}" oninput="upd(${idx},'p',this.value)">
+                    <input type="number" value="${item.q}" oninput="upd(${idx},'q',this.value)">
+                    <select onchange="upd(${idx},'u',this.value)">
+                        <option value="kg" ${item.u=='kg'?'selected':''}>kg</option>
+                        <option value="ltr" ${item.u=='ltr'?'selected':''}>ltr</option>
+                        <option value="pc" ${item.u=='pc'?'selected':''}>pc</option>
+                        <option value="mth" ${item.u=='mth'?'selected':''}>mth</option>
+                    </select>
+                    <div class="row-total">৳${rowTotal.toLocaleString()}</div>
+                </div>`;
+        });
+        container.innerHTML = html;
+        document.getElementById('grandTotal').innerText = '৳ ' + total.toLocaleString();
+        localStorage.setItem('M-Bazar-Cyan-v1', JSON.stringify(dataStore));
+    }
+
+    function upd(idx, f, v) {
+        const key = `${document.getElementById('selMonth').value}-${document.getElementById('selYear').value}`;
+        dataStore[key][idx][f] = f === 'u' ? v : parseFloat(v) || 0;
+        // Updating only the specific row total and grand total to prevent re-render focus loss
+        let total = 0;
+        dataStore[key].forEach(i => total += (i.p * i.q));
+        document.getElementById('grandTotal').innerText = '৳ ' + total.toLocaleString();
+        
+        // Update individual row text without full re-render
+        const rows = document.querySelectorAll('.item-row');
+        const rowTotalDiv = rows[idx].querySelector('.row-total');
+        rowTotalDiv.innerText = '৳' + (dataStore[key][idx].p * dataStore[key][idx].q).toLocaleString();
+        
+        localStorage.setItem('M-Bazar-Cyan-v1', JSON.stringify(dataStore));
+    }
+
+    function addNew() {
+        const n = prompt("🛍️ New Item Name:"); if (!n) return;
+        const key = `${document.getElementById('selMonth').value}-${document.getElementById('selYear').value}`;
+        dataStore[key].push({ n: n, p: 0, q: 1, u: 'kg' });
+        dataStore[key].sort((a, b) => a.n.localeCompare(b.n));
+        render();
+    }
+
+    function exportData() {
+        const key = `${document.getElementById('selMonth').value}-${document.getElementById('selYear').value}`;
+        let csv = "Item,Price,Qty,Unit,Total\n";
+        dataStore[key].forEach(i => csv += `${i.n},${i.p},${i.q},${i.u},${i.p*i.q}\n`);
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `M-Bazar-${key}.csv`;
+        a.click();
+    }
+
+    window.onload = initApp;
+</script>
+
+</body>
+</html>
+
