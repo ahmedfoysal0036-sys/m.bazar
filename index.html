@@ -3,45 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Vault 1.4 - Master Faisal</title>
+    <title>Pro Vault 1.4 - Final Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @keyframes startupFade { 0% { opacity: 0; transform: scale(0.98); } 100% { opacity: 1; transform: scale(1); } }
-        body { animation: startupFade 0.8s ease-out; background-color: #f8fafc; font-family: 'Inter', sans-serif; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        body { animation: fadeIn 0.5s ease-in; background-color: #f8fafc; font-family: 'Inter', sans-serif; }
         .dark-mode { background-color: #0f172a !important; color: #f1f5f9; }
-        .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: white; border-right: 1px solid #e2e8f0; z-index: 50; transition: 0.3s; }
+        .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: white; border-right: 1px solid #e2e8f0; z-index: 50; }
         .dark-mode .sidebar { background: #1e293b; border-color: #334155; }
         .content { margin-left: 260px; padding: 30px; min-height: 100vh; }
         @media (max-width: 768px) { .sidebar { width: 100%; height: auto; position: sticky; } .content { margin-left: 0; padding: 20px; } }
-        .nav-link { padding: 14px 20px; display: block; font-weight: 600; color: #64748b; border-left: 4px solid transparent; text-align: left; }
+        .nav-link { padding: 14px 20px; display: block; font-weight: 600; color: #64748b; border-left: 4px solid transparent; text-align: left; transition: 0.3s; }
         .nav-link.active { color: #f97316; border-left-color: #f97316; background: #fff7ed; }
-        .dark-mode .nav-link.active { background: #334155; color: #fb923c; }
         .node-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-left: 6px solid #f97316; margin-bottom: 15px; }
         .dark-mode .node-card { background: #1e293b; border-color: #334155; }
         .hidden { display: none; }
-        @media print { .no-print { display: none; } .content { margin-left: 0; padding: 0; } }
     </style>
 </head>
 <body id="app-body">
 
-    <div id="auth-gate" class="flex flex-col items-center justify-center min-h-screen p-4 bg-slate-50 dark:bg-slate-900">
-        <div id="login-box" class="max-w-md w-full bg-white dark:bg-gray-800 p-10 rounded-[2.5rem] shadow-2xl">
-            <h1 class="text-3xl font-black text-orange-600 mb-8 text-center tracking-tight">PRO VAULT 1.4</h1>
-            
+    <div id="auth-gate" class="flex flex-col items-center justify-center min-h-screen p-4 bg-slate-100 dark:bg-slate-900">
+        <div class="max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-2xl">
+            <h1 class="text-2xl font-black text-orange-600 mb-6 text-center">PRO VAULT 1.4</h1>
             <div class="space-y-4">
-                <div class="flex gap-2 mb-6">
-                    <button onclick="toggleLoginMode('master')" id="mode-master" class="flex-1 py-2 bg-orange-100 text-orange-600 rounded-xl font-bold border-2 border-orange-500">Master</button>
-                    <button onclick="toggleLoginMode('user')" id="mode-user" class="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold border-2 border-transparent">User OTP</button>
+                <div class="flex gap-2 p-1 bg-gray-100 dark:bg-gray-700 rounded-xl">
+                    <button onclick="setMode('master')" id="m-master" class="flex-1 py-2 rounded-lg font-bold bg-white text-orange-600 shadow-sm">Master</button>
+                    <button onclick="setMode('user')" id="m-user" class="flex-1 py-2 rounded-lg font-bold text-gray-500">OTP Login</button>
                 </div>
-
-                <div class="space-y-4">
-                    <input type="text" id="login-id" placeholder="ID or Email" class="w-full p-4 border rounded-2xl dark:bg-gray-700 outline-none">
-                    <input type="password" id="login-pass" placeholder="Pass / OTP" class="w-full p-4 border rounded-2xl dark:bg-gray-700 outline-none">
-                </div>
-                
-                <button onclick="performLogin()" class="w-full bg-orange-600 text-white p-4 rounded-2xl font-black shadow-lg">ENTER SYSTEM</button>
-                <button onclick="sendWhatsAppOTP()" id="btn-otp-request" class="w-full bg-green-600 text-white p-3 rounded-2xl font-bold text-sm hidden">💬 Request OTP via WhatsApp</button>
-                <p id="auth-err" class="text-red-500 mt-4 hidden text-center italic font-bold">Access Denied!</p>
+                <input type="text" id="login-id" placeholder="ID or Phone" class="w-full p-4 border rounded-2xl dark:bg-gray-700 outline-none focus:ring-2 ring-orange-500">
+                <input type="password" id="login-pass" placeholder="Password or OTP" class="w-full p-4 border rounded-2xl dark:bg-gray-700 outline-none">
+                <button onclick="processLogin()" class="w-full bg-orange-600 text-white p-4 rounded-2xl font-black shadow-lg hover:bg-orange-700 transition">LOGIN TO SYSTEM</button>
+                <button onclick="triggerWA()" id="wa-btn" class="w-full bg-green-600 text-white p-3 rounded-2xl font-bold text-sm hidden">💬 Get OTP on WhatsApp</button>
+                <p id="err-msg" class="text-red-500 text-center hidden font-bold mt-2">Invalid Credentials!</p>
             </div>
         </div>
     </div>
@@ -49,217 +42,189 @@
     <div id="master-dashboard" class="hidden">
         <aside class="sidebar no-print">
             <div class="p-8 text-center border-b dark:border-gray-700">
-                <h2 class="text-xl font-black text-orange-600 italic">M.BAZAR 1.4</h2>
+                <h2 class="text-xl font-black text-orange-600">VAULT PRO</h2>
             </div>
             <nav class="mt-4">
-                <button onclick="showTab('bazar')" class="nav-link w-full active" id="link-bazar">📊 Inventory</button>
-                <button onclick="showTab('gallery')" class="nav-link w-full" id="link-gallery">🖼️ Gallery</button>
-                <button onclick="showTab('report')" class="nav-link w-full" id="link-report">📂 Report Folder</button>
-                <button onclick="showTab('admin')" class="nav-link w-full text-blue-600" id="link-admin">🛡️ Admin Panel</button>
-                <button onclick="showTab('settings')" class="nav-link w-full" id="link-settings">⚙️ Password Settings</button>
+                <button onclick="showTab('bazar')" class="nav-link w-full active" id="l-bazar">📊 Inventory</button>
+                <button onclick="showTab('gallery')" class="nav-link w-full" id="l-gallery">🖼️ Gallery</button>
+                <button onclick="showTab('report')" class="nav-link w-full" id="l-report">📂 Report Folder</button>
+                <button onclick="showTab('admin')" class="nav-link w-full text-blue-600 font-bold" id="l-admin">🛡️ Admin Panel</button>
                 <button onclick="logout()" class="nav-link w-full text-red-500 mt-20">🚪 Logout</button>
             </nav>
         </aside>
 
         <main class="content">
-            <header class="flex justify-between items-center mb-10 no-print">
-                <h1 class="text-2xl font-black">Welcome Professor Faisal</h1>
-                <button onclick="toggleDarkMode()" class="p-3 bg-gray-200 dark:bg-gray-700 rounded-2xl">🌓 Mode</button>
+            <header class="flex justify-between items-center mb-8 no-print">
+                <h1 class="text-2xl font-black">Control Center</h1>
+                <button onclick="toggleDark()" class="p-3 bg-gray-200 dark:bg-gray-700 rounded-xl">🌓</button>
             </header>
 
             <div id="tab-bazar">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 no-print">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 no-print">
                     <div class="node-card">
-                        <h3 class="font-bold mb-4">Add Item</h3>
-                        <div class="space-y-4">
-                            <input type="text" id="it-name" list="item-list" placeholder="Item Name" class="w-full p-4 border rounded-2xl dark:bg-gray-700">
-                            <datalist id="item-list"></datalist>
-                            <div class="grid grid-cols-2 gap-4">
-                                <input type="number" id="it-price" placeholder="Price" oninput="recalc()" class="p-4 border rounded-2xl dark:bg-gray-700">
-                                <input type="number" id="it-qty" placeholder="Qty" oninput="recalc()" class="p-4 border rounded-2xl dark:bg-gray-700">
+                        <h3 class="font-bold mb-4">New Entry</h3>
+                        <div class="space-y-3">
+                            <input type="text" id="in-name" list="items" placeholder="Select Item" class="w-full p-4 border rounded-xl dark:bg-gray-700">
+                            <datalist id="items"></datalist>
+                            <div class="flex gap-2">
+                                <input type="number" id="in-prc" placeholder="Price" oninput="calc()" class="w-1/2 p-4 border rounded-xl dark:bg-gray-700">
+                                <input type="number" id="in-qty" placeholder="Qty" oninput="calc()" class="w-1/2 p-4 border rounded-xl dark:bg-gray-700">
                             </div>
-                            <input type="text" id="it-total" placeholder="Total: ৳ 0" class="w-full p-4 bg-orange-50 dark:bg-gray-700 rounded-2xl font-black text-orange-600" readonly>
-                            <button onclick="addEntry()" class="w-full bg-orange-500 text-white p-4 rounded-2xl font-bold">Add to List</button>
+                            <input type="text" id="in-tot" placeholder="৳ 0" class="w-full p-4 bg-orange-50 text-orange-600 font-bold rounded-xl" readonly>
+                            <button onclick="saveItem()" class="w-full bg-orange-500 text-white p-4 rounded-xl font-bold">Add Item</button>
                         </div>
                     </div>
-                    <div class="bg-orange-500 p-10 rounded-[2rem] text-white flex flex-col justify-center">
-                        <p class="opacity-80">Total Expense</p>
-                        <h2 class="text-5xl font-black">৳ <span id="grand-total">0</span></h2>
-                        <select id="sel-month" onchange="renderAll()" class="mt-4 p-2 bg-orange-600 rounded-xl outline-none font-bold"></select>
+                    <div class="bg-orange-600 p-8 rounded-3xl text-white">
+                        <p class="text-sm opacity-80">Monthly Total</p>
+                        <h2 class="text-5xl font-black">৳ <span id="total-val">0</span></h2>
+                        <select id="sel-m" onchange="loadUI()" class="mt-4 bg-orange-700 p-2 rounded-lg outline-none w-full font-bold"></select>
                     </div>
                 </div>
-                <div id="bazar-display" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                <div id="bazar-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
             <div id="tab-gallery" class="hidden">
-                <div class="node-card text-center no-print">
-                    <label class="bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold cursor-pointer inline-block">
-                        📁 Upload Image
-                        <input type="file" accept="image/*" onchange="uploadImg(event)" class="hidden">
-                    </label>
+                <div class="node-card text-center">
+                    <input type="file" id="f-up" onchange="upImg(event)" class="hidden">
+                    <button onclick="document.getElementById('f-up').click()" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold">Upload to Gallery</button>
                 </div>
-                <div id="gallery-display" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6"></div>
+                <div id="gallery-list" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6"></div>
             </div>
 
             <div id="tab-report" class="hidden">
                 <div class="node-card">
-                    <h3 class="text-xl font-bold mb-4">Monthly Report</h3>
-                    <div id="report-items" class="space-y-2 border-b pb-4 mb-4"></div>
-                    <div class="flex justify-between font-black text-xl mb-6">
-                        <span>Grand Total:</span>
-                        <span id="report-total">৳ 0</span>
-                    </div>
-                    <div class="flex gap-4 no-print">
-                        <button onclick="window.print()" class="bg-black text-white px-8 py-3 rounded-2xl font-bold">Print PDF</button>
-                        <button onclick="sendWAReport()" class="bg-green-600 text-white px-8 py-3 rounded-2xl font-bold">📩 Send to WhatsApp</button>
+                    <h3 class="font-bold mb-4">Monthly Summary</h3>
+                    <div id="rep-data" class="space-y-2 mb-6 border-b pb-4"></div>
+                    <div class="flex justify-between font-black text-xl mb-6"><span>Total:</span><span id="rep-total">৳ 0</span></div>
+                    <div class="flex gap-2 no-print">
+                        <button onclick="window.print()" class="bg-black text-white px-6 py-2 rounded-lg">Print</button>
+                        <button onclick="sendWA()" class="bg-green-600 text-white px-6 py-2 rounded-lg">Send WhatsApp</button>
                     </div>
                 </div>
             </div>
 
             <div id="tab-admin" class="hidden">
                 <div class="node-card">
-                    <h2 class="text-xl font-bold mb-6 text-blue-600">Admin Control</h2>
-                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-2xl">
-                        <p class="text-sm mb-2">Active OTP for Simulation:</p>
-                        <p id="otp-view" class="text-2xl font-mono text-orange-600 tracking-widest">NONE</p>
-                    </div>
+                    <h2 class="font-bold text-blue-600 mb-4">Admin Dashboard</h2>
+                    <p class="text-sm text-gray-500 mb-2">Current Active OTP:</p>
+                    <div id="otp-display" class="text-3xl font-mono font-bold text-orange-600 bg-orange-50 p-4 rounded-xl inline-block">----</div>
                 </div>
             </div>
-
-            <div id="tab-settings" class="hidden">
-                <div class="node-card">
-                    <h2 class="font-bold mb-4">Master Password Settings</h2>
-                    <input type="password" id="m-pass-new" placeholder="New Master Password" class="w-full p-4 border rounded-2xl dark:bg-gray-700 mb-4">
-                    <button onclick="updateMasterPass()" class="bg-orange-600 text-white px-8 py-3 rounded-xl font-bold">Update</button>
-                </div>
-            </div>
-
         </main>
     </div>
 
     <script>
         const MASTER_PHONE = "8801857974447";
-        const MASTER_ITEMS = ["Rice (Chaal)", "Lentils (Daal)", "Oil (Tel)", "Salt (Lobon)", "Sugar (Chini)", "Onion (Peyaj)", "Garlic (Rosun)", "Ginger (Ada)", "Spices", "Potato", "Soap & Detergent", "Toothpaste", "Beef/Chicken/Fish", "Eggs (Dim)", "Milk (Dudh)", "Tea/Coffee", "Flour (Ata/Maida)", "Green Chili (Kacha Morich)", "Dish Soap", "Shampoo", "Toilet Tissue", "Hand Wash", "Butter/Ghee", "Bread/Biscuit", "Honey (Modhu)", "Dry Fruits", "Noodles/Pasta", "Sauce", "Vinegar", "Baking Powder", "Chickpeas", "Semolina", "Cleaning Brushes", "Air Freshener", "Matchbox", "Mustard Oil", "Cereal/Oats", "Beef (Goru)", "Mutton (Khashi)", "Chicken (Murgi)", "Rui Fish", "Katla Fish", "Hilsha (Ilish)", "Shrimp (Chingri)", "WiFi Bill", "Utility Bills", "Tuition Fees", "Bike Fuel/Pocket money", "Parking Bill", "Soya Sauce", "Mosquito Coil", "Soybean Oil", "Sunflower Oil", "Olive Oil", "Coconut Oil", "Rice Bran Oil", "Sesame Oil"];
-
-        const STORE_KEY = 'vault_14_gold_data';
-        let db = JSON.parse(localStorage.getItem(STORE_KEY)) || {
-            bazar: [], gallery: [], auth: { masterId: 'faisal', masterPass: '1234', otp: null }, darkMode: false
+        const ITEM_LIST = ["Rice (Chaal)", "Lentils (Daal)", "Oil (Tel)", "Salt (Lobon)", "Sugar (Chini)", "Onion (Peyaj)", "Garlic (Rosun)", "Ginger (Ada)", "Potato", "Soap", "Toothpaste", "Eggs (Dim)", "Milk (Dudh)", "WiFi Bill", "Utility Bill", "Fuel", "Chicken", "Beef", "Fish"];
+        
+        let storage = JSON.parse(localStorage.getItem('vault_gold_v14')) || {
+            items: [], gallery: [], auth: { mId: 'faisal', mPs: '1234', otp: null }, dark: false
         };
 
-        let currentMode = 'master';
+        let mode = 'master';
 
         window.onload = () => {
-            const list = document.getElementById('item-list');
-            MASTER_ITEMS.forEach(i => { let o = document.createElement('option'); o.value = i; list.appendChild(o); });
+            const dl = document.getElementById('items');
+            ITEM_LIST.forEach(i => { let o = document.createElement('option'); o.value = i; dl.appendChild(o); });
             populateMonths();
-            if(db.darkMode) toggleDarkMode(true);
-            renderAll();
+            if(storage.dark) toggleDark(true);
+            loadUI();
         };
 
-        function toggleLoginMode(m) {
-            currentMode = m;
-            document.getElementById('mode-master').className = m === 'master' ? 'flex-1 py-2 bg-orange-100 text-orange-600 rounded-xl font-bold border-2 border-orange-500' : 'flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold border-2 border-transparent';
-            document.getElementById('mode-user').className = m === 'user' ? 'flex-1 py-2 bg-orange-100 text-orange-600 rounded-xl font-bold border-2 border-orange-500' : 'flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold border-2 border-transparent';
-            document.getElementById('btn-otp-request').classList.toggle('hidden', m === 'master');
+        function setMode(m) {
+            mode = m;
+            document.getElementById('m-master').className = m === 'master' ? 'flex-1 py-2 rounded-lg font-bold bg-white text-orange-600 shadow-sm' : 'flex-1 py-2 rounded-lg font-bold text-gray-500';
+            document.getElementById('m-user').className = m === 'user' ? 'flex-1 py-2 rounded-lg font-bold bg-white text-orange-600 shadow-sm' : 'flex-1 py-2 rounded-lg font-bold text-gray-500';
+            document.getElementById('wa-btn').classList.toggle('hidden', m === 'master');
         }
 
-        function sendWhatsAppOTP() {
-            db.auth.otp = Math.floor(1000 + Math.random() * 9000).toString();
-            const msg = `Master Faisal, Your Vault Access OTP is: ${db.auth.otp}`;
-            window.open(`https://wa.me/${MASTER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
-            document.getElementById('otp-view').innerText = db.auth.otp;
+        function triggerWA() {
+            storage.auth.otp = Math.floor(1000 + Math.random() * 9000).toString();
             save();
+            document.getElementById('otp-display').innerText = storage.auth.otp;
+            const text = encodeURIComponent(`Master Faisal, Your Vault Access OTP: ${storage.auth.otp}`);
+            window.open(`https://api.whatsapp.com/send?phone=${MASTER_PHONE}&text=${text}`, '_blank');
         }
 
-        function sendWAReport() {
-            const m = document.getElementById('sel-month').value;
-            const total = document.getElementById('report-total').innerText;
-            const msg = `Monthly Report (${m})\nMaster Ahmed Faisal\nGrand Total: ${total}\nChecked via Vault Pro.`;
-            window.open(`https://wa.me/${MASTER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
-
-        function performLogin() {
+        function processLogin() {
             const id = document.getElementById('login-id').value;
             const ps = document.getElementById('login-pass').value;
-            if(currentMode === 'master' && id === db.auth.masterId && ps === db.auth.masterPass) {
-                enter();
-            } else if(currentMode === 'user' && ps === db.auth.otp) {
-                enter();
-            } else {
-                document.getElementById('auth-err').classList.remove('hidden');
-            }
+            if((mode === 'master' && id === storage.auth.mId && ps === storage.auth.mPs) || (mode === 'user' && ps === storage.auth.otp)) {
+                document.getElementById('auth-gate').classList.add('hidden');
+                document.getElementById('master-dashboard').classList.remove('hidden');
+            } else { document.getElementById('err-msg').classList.remove('hidden'); }
         }
 
-        function enter() {
-            document.getElementById('auth-gate').classList.add('hidden');
-            document.getElementById('master-dashboard').classList.remove('hidden');
-        }
-
-        function recalc() {
-            const p = document.getElementById('it-price').value || 0;
-            const q = document.getElementById('it-qty').value || 0;
-            document.getElementById('it-total').value = "Total: ৳ " + (p * q);
-        }
-
-        function addEntry() {
-            const n = document.getElementById('it-name').value, p = document.getElementById('it-price').value, q = document.getElementById('it-qty').value, m = document.getElementById('sel-month').value;
+        function saveItem() {
+            const n = document.getElementById('in-name').value, p = document.getElementById('in-prc').value, q = document.getElementById('in-qty').value, m = document.getElementById('sel-m').value;
             if(n && p) {
-                db.bazar.push({ month: m, name: n, price: p, qty: q, total: p*q });
-                save(); renderAll();
-                document.getElementById('it-name').value = '';
+                storage.items.push({ m, n, p, q, t: p*q });
+                save(); loadUI();
+                document.getElementById('in-name').value = '';
             }
         }
 
-        function uploadImg(e) {
-            const r = new FileReader();
-            r.onload = () => { db.gallery.push(r.result); save(); renderAll(); };
-            r.readAsDataURL(e.target.files[0]);
-        }
+        function loadUI() {
+            const m = document.getElementById('sel-m').value;
+            const list = document.getElementById('bazar-list'), rDat = document.getElementById('rep-data');
+            if(!list) return;
+            list.innerHTML = ''; rDat.innerHTML = ''; let gTot = 0;
 
-        function renderAll() {
-            const m = document.getElementById('sel-month').value;
-            const disp = document.getElementById('bazar-display'), rep = document.getElementById('report-items');
-            if(!disp) return;
-            disp.innerHTML = ''; rep.innerHTML = ''; let t = 0;
-
-            db.bazar.filter(i => i.month === m).forEach((item, idx) => {
-                t += item.total;
-                disp.innerHTML += `<div class="node-card flex justify-between"><div><b>${item.name}</b><br><small>${item.qty} x ${item.price}</small></div><div class="text-right"><b>৳${item.total}</b><br><button onclick="del('bazaar', ${idx})" class="text-red-500 text-xs">Delete</button></div></div>`;
-                rep.innerHTML += `<div class="flex justify-between"><span>${item.name}</span><span>৳${item.total}</span></div>`;
+            storage.items.filter(i => i.m === m).forEach((item, idx) => {
+                gTot += item.t;
+                list.innerHTML += `<div class="node-card flex justify-between"><div><b>${item.n}</b><br><small>${item.q} x ${item.p}</small></div><div class="text-right"><b>৳${item.t}</b><br><button onclick="removeItem(${idx})" class="text-red-500 text-xs">Delete</button></div></div>`;
+                rDat.innerHTML += `<div class="flex justify-between text-sm"><span>${item.n}</span><span>৳${item.t}</span></div>`;
             });
 
-            document.getElementById('grand-total').innerText = t;
-            document.getElementById('report-total').innerText = "৳ " + t;
-            document.getElementById('gallery-display').innerHTML = db.gallery.map((g, i) => `<div class="relative"><img src="${g}" class="w-full h-40 object-cover rounded-2xl"><button onclick="del('gallery', ${i})" class="absolute top-2 right-2 bg-red-600 text-white rounded-full w-6 h-6">×</button></div>`).join('');
+            document.getElementById('total-val').innerText = gTot;
+            document.getElementById('rep-total').innerText = "৳ " + gTot;
+            document.getElementById('gallery-list').innerHTML = storage.gallery.map((img, i) => `<div class="relative"><img src="${img}" class="w-full h-32 object-cover rounded-xl"><button onclick="removeImg(${i})" class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">×</button></div>`).join('');
+        }
+
+        function sendWA() {
+            const m = document.getElementById('sel-m').value;
+            const tot = document.getElementById('total-val').innerText;
+            const text = encodeURIComponent(`Monthly Summary (${m})\nTotal Expense: ৳ ${tot}\nVerified by Ahmed Faisal.`);
+            window.open(`https://api.whatsapp.com/send?phone=${MASTER_PHONE}&text=${text}`, '_blank');
         }
 
         function showTab(t) {
-            ['bazar', 'gallery', 'report', 'admin', 'settings'].forEach(x => {
+            ['bazar', 'gallery', 'report', 'admin'].forEach(x => {
                 document.getElementById('tab-' + x).classList.add('hidden');
-                document.getElementById('link-' + x).classList.remove('active');
+                document.getElementById('l-' + x).classList.remove('active');
             });
             document.getElementById('tab-' + t).classList.remove('hidden');
-            document.getElementById('link-' + t).classList.add('active');
+            document.getElementById('l-' + t).classList.add('active');
         }
 
-        function updateMasterPass() {
-            const p = document.getElementById('m-pass-new').value;
-            if(p) { db.auth.masterPass = p; save(); alert("Master Password Updated!"); }
+        function upImg(e) {
+            const f = e.target.files[0];
+            const r = new FileReader();
+            r.onload = () => { storage.gallery.push(r.result); save(); loadUI(); };
+            r.readAsDataURL(f);
         }
 
-        function toggleDarkMode(init=false) { if(!init) db.darkMode = !db.darkMode; document.body.classList.toggle('dark-mode', db.darkMode); save(); }
-        function save() { localStorage.setItem(STORE_KEY, JSON.stringify(db)); }
-        function del(type, i) { db[type].splice(i, 1); save(); renderAll(); }
-        function logout() { location.reload(); }
+        function calc() {
+            const p = document.getElementById('in-prc').value || 0;
+            const q = document.getElementById('in-qty').value || 0;
+            document.getElementById('in-tot').value = "৳ " + (p * q);
+        }
+
         function populateMonths() {
-            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            const sel = document.getElementById('sel-month');
-            months.forEach(m => {
+            const ms = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const s = document.getElementById('sel-m');
+            ms.forEach(m => {
                 let o = document.createElement('option'); o.text = m; o.value = m;
-                if(m === months[new Date().getMonth()]) o.selected = true;
-                sel.add(o);
+                if(m === ms[new Date().getMonth()]) o.selected = true;
+                s.add(o);
             });
         }
+
+        function toggleDark(init=false) { if(!init) storage.dark = !storage.dark; document.body.classList.toggle('dark-mode', storage.dark); save(); }
+        function save() { localStorage.setItem('vault_gold_v14', JSON.stringify(storage)); }
+        function removeItem(i) { storage.items.splice(i, 1); save(); loadUI(); }
+        function removeImg(i) { storage.gallery.splice(i, 1); save(); loadUI(); }
+        function logout() { location.reload(); }
     </script>
 </body>
 </html>
