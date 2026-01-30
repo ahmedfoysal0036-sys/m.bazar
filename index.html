@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Vault 1.4.1 - Dynamic OTP</title>
+    <title>Vault Pro 1.6.1 - 62 Items Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        body { animation: fadeIn 0.5s ease-in; background-color: #f8fafc; font-family: 'Inter', sans-serif; }
+        body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; transition: 0.3s; }
         .dark-mode { background-color: #0f172a !important; color: #f1f5f9; }
         .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: white; border-right: 1px solid #e2e8f0; z-index: 50; }
         .dark-mode .sidebar { background: #1e293b; border-color: #334155; }
         .content { margin-left: 260px; padding: 30px; min-height: 100vh; }
-        @media (max-width: 768px) { .sidebar { width: 100%; height: auto; position: sticky; } .content { margin-left: 0; padding: 20px; } }
-        .nav-link { padding: 14px 20px; display: block; font-weight: 600; color: #64748b; border-left: 4px solid transparent; text-align: left; transition: 0.3s; }
-        .nav-link.active { color: #f97316; border-left-color: #f97316; background: #fff7ed; }
+        @media (max-width: 768px) { .sidebar { width: 100%; height: auto; position: sticky; } .content { margin-left: 0; padding: 15px; } }
+        .nav-link.active { color: #f97316; border-left: 4px solid #f97316; background: #fff7ed; }
         .node-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-left: 6px solid #f97316; margin-bottom: 15px; }
         .dark-mode .node-card { background: #1e293b; border-color: #334155; }
         .hidden { display: none; }
@@ -22,23 +20,20 @@
 </head>
 <body id="app-body">
 
-    <div id="auth-gate" class="flex flex-col items-center justify-center min-h-screen p-4 bg-slate-100 dark:bg-slate-900">
-        <div class="max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-2xl">
-            <h1 class="text-2xl font-black text-orange-600 mb-6 text-center">PRO VAULT 1.4.1</h1>
+    <div id="auth-gate" class="flex flex-col items-center justify-center min-h-screen p-4 bg-slate-900">
+        <div class="max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] shadow-2xl border-t-8 border-orange-600">
+            <h1 class="text-2xl font-black text-center mb-6 uppercase tracking-tighter">Pro Vault 1.6.1</h1>
             <div class="space-y-4">
                 <div class="flex gap-2 p-1 bg-gray-100 dark:bg-gray-700 rounded-xl">
                     <button onclick="setMode('master')" id="m-master" class="flex-1 py-2 rounded-lg font-bold bg-white text-orange-600 shadow-sm">Master</button>
-                    <button onclick="setMode('user')" id="m-user" class="flex-1 py-2 rounded-lg font-bold text-gray-500">OTP Login</button>
+                    <button onclick="setMode('user')" id="m-user" class="flex-1 py-2 rounded-lg font-bold text-gray-500">Phone SMS</button>
                 </div>
-                <input type="text" id="login-id" placeholder="ID or Phone (e.g. 8801...)" class="w-full p-4 border rounded-2xl dark:bg-gray-700 outline-none focus:ring-2 ring-orange-500">
-                <input type="password" id="login-pass" placeholder="Password or OTP" class="w-full p-4 border rounded-2xl dark:bg-gray-700 outline-none">
-                
-                <button onclick="processLogin()" class="w-full bg-orange-600 text-white p-4 rounded-2xl font-black shadow-lg">LOGIN TO SYSTEM</button>
-                
-                <button onclick="triggerDynamicWA()" id="wa-btn" class="w-full bg-green-600 text-white p-3 rounded-2xl font-bold text-sm hidden">💬 Get OTP on User's WhatsApp</button>
-                
-                <p id="err-msg" class="text-red-500 text-center hidden font-bold mt-2">Invalid Credentials!</p>
+                <input type="text" id="login-id" placeholder="Phone/ID" class="w-full p-4 border rounded-2xl dark:bg-gray-700 outline-none">
+                <input type="password" id="login-pass" placeholder="OTP or Master Pass" class="w-full p-4 border rounded-2xl dark:bg-gray-700 outline-none">
+                <button onclick="processLogin()" class="w-full bg-orange-600 text-white p-4 rounded-2xl font-black shadow-lg uppercase">Login</button>
+                <button onclick="sendSMSOTP()" id="sms-btn" class="w-full bg-blue-600 text-white p-3 rounded-2xl font-bold text-sm hidden">📲 Send OTP via SMS</button>
             </div>
+            <p class="text-center text-xs mt-6 text-gray-400">Created by Ahmed Faisal</p>
         </div>
     </div>
 
@@ -51,75 +46,61 @@
                 <button onclick="showTab('bazar')" class="nav-link w-full active" id="l-bazar">📊 Inventory</button>
                 <button onclick="showTab('gallery')" class="nav-link w-full" id="l-gallery">🖼️ Gallery</button>
                 <button onclick="showTab('report')" class="nav-link w-full" id="l-report">📂 Report Folder</button>
-                <button onclick="showTab('admin')" class="nav-link w-full text-blue-600 font-bold" id="l-admin">🛡️ Admin Panel</button>
+                <button onclick="showTab('admin')" class="nav-link w-full text-blue-600 font-bold" id="l-admin">🛡️ Admin Hub</button>
                 <button onclick="logout()" class="nav-link w-full text-red-500 mt-20">🚪 Logout</button>
             </nav>
         </aside>
 
         <main class="content">
             <header class="flex justify-between items-center mb-8 no-print">
-                <h1 class="text-2xl font-black italic">Working for Ultimate Gallery</h1>
+                <h1 class="text-xl font-black italic">Working for Ultimate Gallery</h1>
                 <button onclick="toggleDark()" class="p-3 bg-gray-200 dark:bg-gray-700 rounded-xl">🌓</button>
             </header>
 
             <div id="tab-bazar">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 no-print">
                     <div class="node-card">
-                        <h3 class="font-bold mb-4">New Entry</h3>
+                        <h3 class="font-bold mb-4">Add Item (62 Items Ready)</h3>
                         <div class="space-y-3">
-                            <input type="text" id="in-name" list="items" placeholder="Select Item" class="w-full p-4 border rounded-xl dark:bg-gray-700">
+                            <input type="text" id="in-name" list="items" placeholder="Type or Select Item" class="w-full p-4 border rounded-xl dark:bg-gray-700">
                             <datalist id="items"></datalist>
                             <div class="flex gap-2">
                                 <input type="number" id="in-prc" placeholder="Price" oninput="calc()" class="w-1/2 p-4 border rounded-xl dark:bg-gray-700">
                                 <input type="number" id="in-qty" placeholder="Qty" oninput="calc()" class="w-1/2 p-4 border rounded-xl dark:bg-gray-700">
                             </div>
                             <input type="text" id="in-tot" placeholder="৳ 0" class="w-full p-4 bg-orange-50 text-orange-600 font-bold rounded-xl" readonly>
-                            <button onclick="saveItem()" class="w-full bg-orange-500 text-white p-4 rounded-xl font-bold">Add Item</button>
+                            <button onclick="saveItem()" class="w-full bg-orange-500 text-white p-4 rounded-xl font-bold">Add to List</button>
                         </div>
                     </div>
-                    <div class="bg-orange-600 p-8 rounded-3xl text-white shadow-xl">
-                        <p class="text-sm opacity-80">Monthly Total</p>
-                        <h2 class="text-5xl font-black">৳ <span id="total-val">0</span></h2>
-                        <select id="sel-m" onchange="loadUI()" class="mt-4 bg-orange-700 p-2 rounded-lg outline-none w-full font-bold"></select>
+                    <div class="bg-orange-600 p-8 rounded-[2rem] text-white shadow-xl">
+                        <p class="text-sm opacity-80 uppercase tracking-widest">Monthly Expense</p>
+                        <h2 class="text-6xl font-black mb-4">৳ <span id="total-val">0</span></h2>
+                        <select id="sel-m" onchange="loadUI()" class="w-full bg-orange-700 p-3 rounded-xl outline-none font-bold border-none"></select>
                     </div>
                 </div>
                 <div id="bazar-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
-            <div id="tab-gallery" class="hidden">
-                <div class="node-card text-center">
-                    <input type="file" id="f-up" onchange="upImg(event)" class="hidden">
-                    <button onclick="document.getElementById('f-up').click()" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold">Upload to Gallery</button>
-                </div>
-                <div id="gallery-list" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6"></div>
-            </div>
-
-            <div id="tab-report" class="hidden">
-                <div class="node-card">
-                    <h3 class="font-bold mb-4">Monthly Summary</h3>
-                    <div id="rep-data" class="space-y-2 mb-6 border-b pb-4"></div>
-                    <div class="flex justify-between font-black text-xl mb-6"><span>Total:</span><span id="rep-total">৳ 0</span></div>
-                    <div class="flex gap-2 no-print">
-                        <button onclick="window.print()" class="bg-black text-white px-6 py-2 rounded-lg">Print</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-admin" class="hidden">
-                <div class="node-card">
-                    <h2 class="font-bold text-blue-600 mb-4 text-xl">🛡️ Admin Dashboard</h2>
-                    <p class="text-sm text-gray-500 mb-2">Last Generated OTP (for bypass):</p>
-                    <div id="otp-display" class="text-3xl font-mono font-bold text-orange-600 bg-orange-50 p-4 rounded-xl inline-block tracking-[10px]">----</div>
-                </div>
-            </div>
+            <div id="tab-gallery" class="hidden"><div class="node-card text-center mb-6"><input type="file" id="f-up" onchange="upImg(event)" class="hidden"><button onclick="document.getElementById('f-up').click()" class="bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold">📁 Upload Photo</button></div><div id="gallery-list" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div></div>
+             <div id="tab-report" class="hidden"><div class="node-card"><h3 class="font-bold mb-4 text-xl">Monthly Summary Sheet</h3><div id="rep-data" class="space-y-2 mb-6 border-b pb-4 text-sm"></div><div class="flex justify-between font-black text-2xl"><span>Grand Total:</span><span id="rep-total" class="text-orange-600">৳ 0</span></div><button onclick="window.print()" class="mt-8 bg-black text-white px-8 py-3 rounded-xl font-bold no-print">Print PDF</button></div></div>
+             <div id="tab-admin" class="hidden"><div class="node-card"><h2 class="font-bold text-blue-600 mb-4 text-xl">Security Dashboard</h2><p class="text-sm opacity-50 mb-2 uppercase">Last Active SMS OTP</p><div id="otp-admin" class="text-4xl font-mono font-bold text-blue-600 bg-blue-50 p-6 rounded-2xl inline-block tracking-[12px]">----</div></div></div>
         </main>
     </div>
 
     <script>
         const MASTER_PHONE = "8801857974447";
-        const ITEM_LIST = ["Rice (Chaal)", "Lentils (Daal)", "Oil (Tel)", "Salt (Lobon)", "Sugar (Chini)", "Onion (Peyaj)", "Garlic (Rosun)", "Ginger (Ada)", "Potato", "Soap", "Toothpaste", "Eggs (Dim)", "Milk (Dudh)", "WiFi Bill", "Utility Bill", "Fuel", "Chicken", "Beef", "Fish", "Tuition Fees", "Bread/Biscuit", "Green Chili", "Dish Soap", "Shampoo", "Hand Wash", "Honey", "Noodles", "Cereal", "Mustard Oil"];
+        // THE FULL 62 ITEMS LIST
+        const ITEM_LIST = [
+            "Rice (Chaal)", "Lentils (Daal)", "Soyabean Oil", "Mustard Oil", "Salt (Lobon)", "Sugar (Chini)", "Onion (Peyaj)", "Garlic (Rosun)", "Ginger (Ada)", "Potato (Alu)", 
+            "Turmeric (Holud)", "Chili Powder (Morich)", "Cumin (Jeera)", "Coriander (Dhoniya)", "Garam Masala", "Cardamom (Elachi)", "Cinnamon (Daruchini)", "Cloves (Long)", "Bay Leaf (Tejpata)", "Tomato", 
+            "Eggplant (Begun)", "Cucumber (Shosha)", "Lemon (Lebu)", "Green Chili (Kacha Morich)", "Chicken", "Beef", "Mutton", "Fish", "Eggs (Dim)", "Milk (Dudh)", 
+            "Tea (Cha)", "Biscuit", "Bread", "Butter", "Ghee", "Flour (Atta)", "Maida", "Suji", "Noodles", "Pasta", 
+            "Soap (Body)", "Detergent", "Dish Wash", "Toothpaste", "Toothbrush", "Shampoo", "Conditioner", "Hand Wash", "Harpic", "Phenyl", 
+            "Tissue Paper", "WiFi Bill", "Electric Bill", "Gas Bill", "Water Bill", "Rent", "Medicine", "Fruits", "Fuel", "Mobile Recharge", 
+            "Newspaper", "Garbage Bill"
+        ];
         
-        let storage = JSON.parse(localStorage.getItem('vault_gold_v141')) || {
+        let storage = JSON.parse(localStorage.getItem('vault_final_v161')) || {
             items: [], gallery: [], auth: { mId: 'faisal', mPs: '1234', otp: null }, dark: false
         };
 
@@ -137,24 +118,18 @@
             mode = m;
             document.getElementById('m-master').className = m === 'master' ? 'flex-1 py-2 rounded-lg font-bold bg-white text-orange-600 shadow-sm' : 'flex-1 py-2 rounded-lg font-bold text-gray-500';
             document.getElementById('m-user').className = m === 'user' ? 'flex-1 py-2 rounded-lg font-bold bg-white text-orange-600 shadow-sm' : 'flex-1 py-2 rounded-lg font-bold text-gray-500';
-            document.getElementById('wa-btn').classList.toggle('hidden', m === 'master');
+            document.getElementById('sms-btn').classList.toggle('hidden', m === 'master');
         }
 
-        // DYNAMIC WHATSAPP OTP LOGIC
-        function triggerDynamicWA() {
-            const userPhone = document.getElementById('login-id').value;
-            if(!userPhone || userPhone.length < 10) {
-                alert("Please enter a valid phone number in the ID field!");
-                return;
-            }
-
+        async function sendSMSOTP() {
+            const phone = document.getElementById('login-id').value;
+            if(!phone) return alert("Enter Phone Number!");
             storage.auth.otp = Math.floor(1000 + Math.random() * 9000).toString();
             save();
-            document.getElementById('otp-display').innerText = storage.auth.otp;
-            
-            const text = encodeURIComponent(`Vault Access OTP: ${storage.auth.otp}\n(Security by Ahmed Faisal)`);
-            // Dynamic link using the phone number entered in the ID field
-            window.open(`https://api.whatsapp.com/send?phone=${userPhone}&text=${text}`, '_blank');
+            document.getElementById('otp-admin').innerText = storage.auth.otp;
+            setTimeout(() => {
+                alert(`[SMS GATEWAY]\nTo: ${phone}\nMessage: Your Vault OTP is ${storage.auth.otp}. (Ahmed Faisal)`);
+            }, 1000);
         }
 
         function processLogin() {
@@ -163,13 +138,9 @@
             if((mode === 'master' && id === storage.auth.mId && ps === storage.auth.mPs) || (mode === 'user' && ps === storage.auth.otp)) {
                 document.getElementById('auth-gate').classList.add('hidden');
                 document.getElementById('master-dashboard').classList.remove('hidden');
-            } else { 
-                document.getElementById('err-msg').classList.remove('hidden'); 
-                setTimeout(() => document.getElementById('err-msg').classList.add('hidden'), 3000);
-            }
+            } else { alert("Access Denied!"); }
         }
 
-        // Inventory & UI logic remains same
         function saveItem() {
             const n = document.getElementById('in-name').value, p = document.getElementById('in-prc').value, q = document.getElementById('in-qty').value, m = document.getElementById('sel-m').value;
             if(n && p) {
@@ -187,11 +158,17 @@
             storage.items.filter(i => i.m === m).forEach((item, idx) => {
                 gTot += item.t;
                 list.innerHTML += `<div class="node-card flex justify-between"><div><b>${item.n}</b><br><small>${item.q} x ${item.p}</small></div><div class="text-right"><b>৳${item.t}</b><br><button onclick="removeItem(${idx})" class="text-red-500 text-xs">Delete</button></div></div>`;
-                rDat.innerHTML += `<div class="flex justify-between text-sm"><span>${item.n}</span><span>৳${item.t}</span></div>`;
+                rDat.innerHTML += `<div class="flex justify-between"><span>${item.n} (${item.q}x${item.p})</span><span>৳${item.t}</span></div>`;
             });
             document.getElementById('total-val').innerText = gTot;
             document.getElementById('rep-total').innerText = "৳ " + gTot;
-            document.getElementById('gallery-list').innerHTML = storage.gallery.map((img, i) => `<div class="relative"><img src="${img}" class="w-full h-32 object-cover rounded-xl"><button onclick="removeImg(${i})" class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">×</button></div>`).join('');
+            document.getElementById('gallery-list').innerHTML = storage.gallery.map((img, i) => `<div class="relative"><img src="${img}" class="w-full h-40 object-cover rounded-2xl"><button onclick="removeImg(${i})" class="absolute top-2 right-2 bg-red-600 text-white rounded-full w-6 h-6">×</button></div>`).join('');
+        }
+
+        function upImg(e) {
+            const r = new FileReader();
+            r.onload = () => { storage.gallery.push(r.result); save(); loadUI(); };
+            r.readAsDataURL(e.target.files[0]);
         }
 
         function showTab(t) {
@@ -201,13 +178,6 @@
             });
             document.getElementById('tab-' + t).classList.remove('hidden');
             document.getElementById('l-' + t).classList.add('active');
-        }
-
-        function upImg(e) {
-            const f = e.target.files[0];
-            const r = new FileReader();
-            r.onload = () => { storage.gallery.push(r.result); save(); loadUI(); };
-            r.readAsDataURL(f);
         }
 
         function calc() {
@@ -227,7 +197,7 @@
         }
 
         function toggleDark(init=false) { if(!init) storage.dark = !storage.dark; document.body.classList.toggle('dark-mode', storage.dark); save(); }
-        function save() { localStorage.setItem('vault_gold_v141', JSON.stringify(storage)); }
+        function save() { localStorage.setItem('vault_final_v161', JSON.stringify(storage)); }
         function removeItem(i) { storage.items.splice(i, 1); save(); loadUI(); }
         function removeImg(i) { storage.gallery.splice(i, 1); save(); loadUI(); }
         function logout() { location.reload(); }
