@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Vault Pro 1.0 - Master Faisal</title>
+    <title>Personal Vault Pro 1.1 - Master Faisal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root { --main-color: #FF8C00; }
@@ -22,7 +22,7 @@
     <div class="text-center text-xs text-gray-400 mb-4 no-print">Created by Ahmed Faisal.</div>
 
     <div id="auth-gate" class="max-w-md mx-auto mt-20 p-8 bg-white rounded-2xl shadow-2xl no-print">
-        <h2 class="text-2xl font-bold mb-6 text-orange-600 text-center">Personal Vault Pro 1.0</h2>
+        <h2 class="text-2xl font-bold mb-6 text-orange-600 text-center">Personal Vault Pro 1.1</h2>
         <div onkeypress="if(event.keyCode==13) authorizeSystem()">
             <input type="text" id="user-id" placeholder="Identity" class="w-full p-4 mb-4 border rounded-xl outline-orange-500">
             <input type="password" id="access-code" placeholder="Access Code" class="w-full p-4 mb-6 border rounded-xl outline-orange-500">
@@ -33,7 +33,7 @@
 
     <div id="master-dashboard" class="hidden max-w-6xl mx-auto">
         <div class="flex flex-wrap justify-between items-center mb-6 no-print gap-4">
-            <h1 class="text-2xl font-bold text-orange-600">Personal Vault Pro 1.0</h1>
+            <h1 class="text-2xl font-bold text-orange-600">Personal Vault Pro 1.1</h1>
             <div class="flex gap-2 items-center">
                 <button onclick="toggleDarkMode()" class="bg-gray-200 dark:bg-gray-700 px-3 py-2 rounded-lg text-sm">🌓 Mode</button>
                 <input type="password" id="hero-check" onkeyup="checkTony()" placeholder="Tony Protocol" class="p-2 border rounded-lg text-sm w-32 shadow-inner">
@@ -43,14 +43,15 @@
 
         <div id="tony-content" class="hidden">
             <div class="bazar-header mb-8">
-                <h1 class="text-3xl font-bold">M.Bazar & Secure Vault</h1>
-                <p id="budget-warning" class="mt-2 text-yellow-200 font-bold hidden">⚠️ Warning: Budget Limit (80%) Exceeded!</p>
+                <h1 class="text-3xl font-bold italic">Smart Dashboard</h1>
+                <p id="budget-warning" class="mt-2 text-yellow-200 font-bold hidden">⚠️ Budget Limit (80%) Exceeded!</p>
             </div>
 
             <div class="flex space-x-2 md:space-x-4 mb-6 border-b overflow-x-auto no-print">
                 <button onclick="showTab('bazar')" id="btn-bazar" class="py-2 px-4 font-bold border-b-2 border-orange-500">Inventory</button>
                 <button onclick="showTab('vault')" id="btn-vault" class="py-2 px-4 font-bold border-b-2 border-transparent">Vault</button>
                 <button onclick="showTab('gallery')" id="btn-gallery" class="py-2 px-4 font-bold border-b-2 border-transparent">Gallery</button>
+                <button onclick="showTab('guide')" id="btn-guide" class="py-2 px-4 font-bold border-b-2 border-transparent">User Guide</button>
                 <button onclick="showTab('jobs')" id="btn-jobs" class="py-2 px-4 font-bold border-b-2 border-transparent">Settings</button>
             </div>
 
@@ -58,11 +59,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 no-print">
                     <select id="sel-month" onchange="renderBazar()" class="p-3 border rounded-xl font-semibold"></select>
                     <input type="text" id="search-bazar" onkeyup="renderBazar()" placeholder="🔍 Search item..." class="p-3 border rounded-xl">
-                    <div class="bg-orange-100 p-3 rounded-xl text-orange-700 font-bold text-center border border-orange-200">
-                        Total Spent: ৳ <span id="total-val">0.00</span>
-                    </div>
+                    <div class="bg-orange-100 p-3 rounded-xl text-orange-700 font-bold text-center border border-orange-200">Total: ৳ <span id="total-val">0.00</span></div>
                 </div>
-
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border mb-6 no-print">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <input type="text" id="it-name" placeholder="Item Name" class="p-3 border rounded-lg">
@@ -70,52 +68,54 @@
                         <input type="number" id="it-qty" placeholder="Qty" class="p-3 border rounded-lg">
                         <select id="it-unit" class="p-3 border rounded-lg"><option>KG</option><option>GM</option><option>Litre</option><option>Piece</option></select>
                     </div>
-                    <button onclick="addBazarItem()" class="mt-4 bg-green-600 text-white px-8 py-3 rounded-xl font-bold">Add Item</button>
+                    <button onclick="addBazarItem()" class="mt-4 bg-green-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-700">Add Item</button>
                     <button onclick="window.print()" class="mt-4 bg-gray-600 text-white px-8 py-3 rounded-xl font-bold ml-2">Print</button>
                 </div>
                 <div id="bazar-display" class="space-y-2"></div>
             </div>
 
-            <div id="tab-gallery" class="hidden">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border mb-6 no-print">
-                    <input type="text" id="img-url" placeholder="Paste Image/Icon URL..." class="w-full p-3 border rounded-xl mb-4">
-                    <button onclick="addGallery()" class="bg-orange-500 text-white px-6 py-2 rounded-xl font-bold">Add to Gallery</button>
+            <div id="tab-guide" class="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border">
+                        <h3 class="text-xl font-bold mb-4 text-orange-600">📖 User Guide</h3>
+                        <ul class="space-y-2 text-sm">
+                            <li>✔️ <b>Inventory:</b> মাস অনুযায়ী বাজারের সব খরচ লিখে রাখা যায়।</li>
+                            <li>✔️ <b>Vault:</b> আপনার সিক্রেট পাসওয়ার্ড বা নোট এনক্রিপ্টেড থাকে।</li>
+                            <li>✔️ <b>Gallery:</b> পছন্দের ছবির ইউআরএল দিয়ে গ্যালারি সাজানো যায়।</li>
+                            <li>✔️ <b>Backup:</b> যেকোনো সময় ডাটা ডাউনলোড করে গুগল ড্রাইভে রাখা যায়।</li>
+                            <li>✔️ <b>Tony Mode:</b> সিকিউরিটির জন্য 'Tony' টাইপ করলেই সব ফিচার আনলক হয়।</li>
+                        </ul>
+                    </div>
+                    <div class="bg-orange-50 dark:bg-gray-900 p-6 rounded-2xl border border-orange-200">
+                        <h3 class="text-xl font-bold mb-4">📩 Feedback & Bug Inbox</h3>
+                        <textarea id="report-input" placeholder="আপনার আইডিয়া বা কোনো সমস্যা থাকলে এখানে লিখে আমাদের জানান..." class="w-full p-3 border rounded-xl mb-3 h-24 dark:bg-gray-800"></textarea>
+                        <button onclick="submitReport()" class="w-full bg-orange-500 text-white py-3 rounded-xl font-bold hover:bg-orange-600">Send Report</button>
+                    </div>
                 </div>
-                <div id="gallery-display" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-            </div>
-
-            <div id="tab-vault" class="hidden">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border mb-6 no-print">
-                    <textarea id="vault-data" placeholder="Secret Note..." class="w-full p-4 border rounded-xl mb-2 h-32"></textarea>
-                    <button onclick="saveVault()" class="bg-blue-600 text-white px-8 py-2 rounded-xl font-bold">Save Secret</button>
-                </div>
-                <div id="vault-display"></div>
             </div>
 
             <div id="tab-jobs" class="hidden">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border">
-                        <h3 class="font-bold mb-4">Quick Tasks</h3>
-                        <input type="text" id="job-text" placeholder="Job description..." class="w-full p-3 border rounded-lg mb-2">
-                        <button onclick="addJob()" class="bg-purple-600 text-white w-full py-2 rounded-lg font-bold">Log Task</button>
-                        <div id="job-display" class="mt-4"></div>
+                        <h3 class="font-bold mb-4 text-red-500">🚩 Admin Report Box</h3>
+                        <div id="report-display" class="space-y-2 max-h-60 overflow-y-auto"></div>
                     </div>
-                    <div class="bg-gray-100 dark:bg-gray-900 p-6 rounded-2xl border-2 border-dashed border-gray-400 no-print text-center">
+                    <div class="bg-gray-100 dark:bg-gray-900 p-6 rounded-2xl border-2 border-dashed border-gray-400 text-center">
                         <h3 class="font-bold mb-4">Cloud Backup</h3>
-                        <button onclick="exportData()" class="bg-black text-white w-full py-3 rounded-xl font-bold mb-4">📥 Download Backup File</button>
-                        <label class="bg-blue-600 text-white block py-3 rounded-xl font-bold cursor-pointer">
-                            📤 Restore from File
-                            <input type="file" id="importFile" onchange="importData(event)" class="hidden">
-                        </label>
+                        <button onclick="exportData()" class="bg-black text-white w-full py-3 rounded-xl font-bold mb-4">📥 Download Backup</button>
+                        <label class="bg-blue-600 text-white block py-3 rounded-xl font-bold cursor-pointer">📤 Restore Data <input type="file" id="importFile" onchange="importData(event)" class="hidden"></label>
                     </div>
                 </div>
             </div>
+
+            <div id="tab-gallery" class="hidden"><div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border mb-6"><input type="text" id="img-url" placeholder="Paste Image URL..." class="w-full p-3 border rounded-xl mb-4"><button onclick="addGallery()" class="bg-orange-500 text-white px-6 py-2 rounded-xl font-bold">Add Image</button></div><div id="gallery-display" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div></div>
+            <div id="tab-vault" class="hidden"><div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border mb-6"><textarea id="vault-data" placeholder="Secret Note..." class="w-full p-4 border rounded-xl mb-2 h-32"></textarea><button onclick="saveVault()" class="bg-blue-600 text-white px-8 py-2 rounded-xl font-bold">Save Secret</button></div><div id="vault-display"></div></div>
         </div>
     </div>
 
     <script>
-        const STORAGE_KEY = 'm_bazar_v10';
-        let db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { bazaar: [], vault: [], jobs: [], gallery: [], isAuth: false, isTony: false, darkMode: false };
+        const STORAGE_KEY = 'm_bazar_v11';
+        let db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { bazaar: [], vault: [], reports: [], gallery: [], isAuth: false, isTony: false, darkMode: false };
 
         window.onload = () => {
             if(db.isAuth) {
@@ -124,139 +124,87 @@
                 if(db.isTony) document.getElementById('tony-content').classList.remove('hidden');
             }
             if(db.darkMode) toggleDarkMode(true);
-            populateMonths();
-            renderBazar();
+            populateMonths(); renderBazar();
         };
 
         function authorizeSystem() {
             if(document.getElementById('user-id').value === "faisal" && document.getElementById('access-code').value === "1234") {
-                db.isAuth = true; saveDB();
-                location.reload();
+                db.isAuth = true; saveDB(); location.reload();
             } else { document.getElementById('auth-err').classList.remove('hidden'); }
         }
 
         function checkTony() {
             if(document.getElementById('hero-check').value.toLowerCase() === "tony") {
-                db.isTony = true; saveDB();
-                document.getElementById('tony-content').classList.remove('hidden');
-                renderBazar();
+                db.isTony = true; saveDB(); document.getElementById('tony-content').classList.remove('hidden'); renderBazar(); renderReports();
             }
         }
 
-        function logout() { db.isAuth = false; db.isTony = false; saveDB(); location.reload(); }
-
-        function toggleDarkMode(init = false) {
-            if(!init) db.darkMode = !db.darkMode;
-            document.body.classList.toggle('dark-mode', db.darkMode);
-            saveDB();
+        function submitReport() {
+            const r = document.getElementById('report-input').value;
+            if(r) {
+                db.reports.push({ msg: r, date: new Date().toLocaleString() });
+                saveDB(); alert("Report sent to Admin Box!"); document.getElementById('report-input').value = ''; renderReports();
+            }
         }
 
+        function renderReports() {
+            document.getElementById('report-display').innerHTML = db.reports.map((r, i) => `
+                <div class="p-3 bg-red-50 dark:bg-gray-700 rounded-lg text-xs border border-red-100">
+                    <b>${r.date}:</b> ${r.msg} <button onclick="delItem('reports', ${i})" class="text-red-500 float-right">×</button>
+                </div>`).join('') || '<p class="text-gray-400 text-xs">No reports found.</p>';
+        }
+
+        function logout() { db.isAuth = false; db.isTony = false; saveDB(); location.reload(); }
+        function toggleDarkMode(init = false) { if(!init) db.darkMode = !db.darkMode; document.body.classList.toggle('dark-mode', db.darkMode); saveDB(); }
         function saveDB() { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
 
         function showTab(tab) {
-            ['bazar', 'vault', 'gallery', 'jobs'].forEach(t => {
+            ['bazar', 'vault', 'gallery', 'guide', 'jobs'].forEach(t => {
                 document.getElementById('tab-' + t).classList.add('hidden');
                 document.getElementById('btn-' + t).classList.replace('border-orange-500', 'border-transparent');
             });
             document.getElementById('tab-' + tab).classList.remove('hidden');
             document.getElementById('btn-' + tab).classList.replace('border-transparent', 'border-orange-500');
-            if(tab === 'bazar') renderBazar();
-            if(tab === 'vault') renderVault();
-            if(tab === 'gallery') renderGallery();
-            if(tab === 'jobs') renderJobs();
+            if(tab === 'jobs') renderReports();
         }
 
         function populateMonths() {
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             const sel = document.getElementById('sel-month');
-            const currentMonth = months[new Date().getMonth()];
             months.forEach(m => {
-                let opt = document.createElement('option');
-                opt.text = m; opt.value = m;
-                if(m === currentMonth) opt.selected = true;
+                let opt = document.createElement('option'); opt.text = m; opt.value = m;
+                if(m === months[new Date().getMonth()]) opt.selected = true;
                 sel.add(opt);
             });
         }
 
         function addBazarItem() {
-            const name = document.getElementById('it-name').value;
-            const price = parseFloat(document.getElementById('it-price').value) || 0;
-            const qty = parseFloat(document.getElementById('it-qty').value) || 0;
-            const unit = document.getElementById('it-unit').value;
-            const month = document.getElementById('sel-month').value;
+            const name = document.getElementById('it-name').value, price = parseFloat(document.getElementById('it-price').value) || 0, qty = parseFloat(document.getElementById('it-qty').value) || 0, unit = document.getElementById('it-unit').value, month = document.getElementById('sel-month').value;
             if(name && price) {
                 let total = (unit === "GM") ? (price / 1000) * qty : price * qty;
                 db.bazaar.push({ month, name, price, qty, unit, total, date: new Date().toLocaleDateString() });
-                saveDB(); renderBazar();
-                document.getElementById('it-name').value = '';
+                saveDB(); renderBazar(); document.getElementById('it-name').value = '';
             }
         }
 
         function renderBazar() {
-            const display = document.getElementById('bazar-display');
-            const selectedMonth = document.getElementById('sel-month').value;
-            const search = document.getElementById('search-bazar').value.toLowerCase();
+            const display = document.getElementById('bazar-display'), selectedMonth = document.getElementById('sel-month').value, search = document.getElementById('search-bazar').value.toLowerCase();
             display.innerHTML = ''; let monthTotal = 0;
-            db.bazaar.filter(i => i.month === selectedMonth && i.name.toLowerCase().includes(search)).forEach((item, idx) => {
+            db.bazaar.filter(i => i.month === selectedMonth && i.name.toLowerCase().includes(search)).forEach((item) => {
                 monthTotal += item.total;
-                display.innerHTML += `<div class="node-card flex justify-between items-center">
-                    <div><b>${item.name}</b> <small>(${item.qty} ${item.unit})</small></div>
-                    <div class="text-right"><b>৳${item.total.toFixed(2)}</b> <button onclick="delItem('bazaar', ${db.bazaar.indexOf(item)})" class="text-red-500 ml-2 no-print">×</button></div>
-                </div>`;
+                display.innerHTML += `<div class="node-card flex justify-between items-center"><div><b>${item.name}</b> <small>(${item.qty} ${item.unit})</small></div><div class="text-right"><b>৳${item.total.toFixed(2)}</b> <button onclick="delItem('bazaar', ${db.bazaar.indexOf(item)})" class="text-red-500 ml-2 no-print">×</button></div></div>`;
             });
             document.getElementById('total-val').innerText = monthTotal.toLocaleString();
-            document.getElementById('budget-warning').classList.toggle('hidden', monthTotal < 8000); // 8000 is 80% of 10k
+            document.getElementById('budget-warning').classList.toggle('hidden', monthTotal < 8000);
         }
 
-        function saveVault() {
-            const note = document.getElementById('vault-data').value;
-            if(note) { db.vault.push({ note, date: new Date().toLocaleString() }); saveDB(); renderVault(); document.getElementById('vault-data').value = ''; }
-        }
-        function renderVault() {
-            document.getElementById('vault-display').innerHTML = db.vault.map((v, i) => `<div class="node-card">
-                <div class="flex justify-between font-mono text-sm"><span>${v.note}</span><button onclick="delItem('vault', ${i})" class="text-red-500">×</button></div>
-                <div class="text-[10px] text-gray-400 mt-2">${v.date}</div>
-            </div>`).join('');
-        }
-
-        function addGallery() {
-            const url = document.getElementById('img-url').value;
-            if(url) { db.gallery.push(url); saveDB(); renderGallery(); document.getElementById('img-url').value = ''; }
-        }
-        function renderGallery() {
-            document.getElementById('gallery-display').innerHTML = db.gallery.map((url, i) => `
-                <div class="relative group">
-                    <img src="${url}" class="w-full h-32 object-cover rounded-xl shadow-md">
-                    <button onclick="delItem('gallery', ${i})" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 text-xs no-print">×</button>
-                </div>`).join('');
-        }
-
-        function addJob() {
-            const task = document.getElementById('job-text').value;
-            if(task) { db.jobs.push({ task, date: new Date().toLocaleDateString() }); saveDB(); renderJobs(); document.getElementById('job-text').value = ''; }
-        }
-        function renderJobs() {
-            document.getElementById('job-display').innerHTML = db.jobs.map((j, i) => `<div class="node-card flex justify-between">
-                <span>${j.task}</span><button onclick="delItem('jobs', ${i})" class="text-red-500">×</button>
-            </div>`).join('');
-        }
-
+        function saveVault() { const note = document.getElementById('vault-data').value; if(note) { db.vault.push({ note, date: new Date().toLocaleString() }); saveDB(); renderVault(); document.getElementById('vault-data').value = ''; } }
+        function renderVault() { document.getElementById('vault-display').innerHTML = db.vault.map((v, i) => `<div class="node-card"><div class="flex justify-between font-mono text-sm"><span>${v.note}</span><button onclick="delItem('vault', ${i})" class="text-red-500">×</button></div><div class="text-[10px] text-gray-400 mt-2">${v.date}</div></div>`).join(''); }
+        function addGallery() { const url = document.getElementById('img-url').value; if(url) { db.gallery.push(url); saveDB(); renderGallery(); document.getElementById('img-url').value = ''; } }
+        function renderGallery() { document.getElementById('gallery-display').innerHTML = db.gallery.map((url, i) => `<div class="relative group"><img src="${url}" class="w-full h-32 object-cover rounded-xl shadow-md"><button onclick="delItem('gallery', ${i})" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 text-xs no-print">×</button></div>`).join(''); }
         function delItem(type, i) { if(confirm("Delete?")) { db[type].splice(i, 1); saveDB(); location.reload(); } }
-
-        function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-            const a = document.createElement('a'); a.setAttribute("href", dataStr);
-            a.setAttribute("download", "Vault_Pro_Backup.json"); a.click();
-        }
-
-        function importData(e) {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                db = JSON.parse(ev.target.result);
-                saveDB(); alert("Restored!"); location.reload();
-            };
-            reader.readAsText(e.target.files[0]);
-        }
+        function exportData() { const a = document.createElement('a'); a.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db))); a.setAttribute("download", "Vault_Pro_V1.1_Backup.json"); a.click(); }
+        function importData(e) { const reader = new FileReader(); reader.onload = (ev) => { db = JSON.parse(ev.target.result); saveDB(); location.reload(); }; reader.readAsText(e.target.files[0]); }
     </script>
 </body>
 </html>
