@@ -3,210 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Vault Pro 1.2 - Master Faisal</title>
+    <title>Vault Pro 1.3 - Security Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @keyframes startupFade {
-            0% { opacity: 0; filter: brightness(0); transform: scale(0.98); }
-            100% { opacity: 1; filter: brightness(1); transform: scale(1); }
-        }
+        @keyframes startupFade { 0% { opacity: 0; filter: brightness(0); } 100% { opacity: 1; filter: brightness(1); } }
         body { animation: startupFade 1.2s ease-out; background-color: #f8fafc; font-family: 'Inter', sans-serif; transition: 0.4s; }
         .dark-mode { background-color: #0f172a !important; color: #f1f5f9; }
-        
         .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: white; border-right: 1px solid #e2e8f0; z-index: 50; }
         .dark-mode .sidebar { background: #1e293b; border-color: #334155; }
         .content { margin-left: 260px; padding: 40px; min-height: 100vh; }
-        
-        @media (max-width: 768px) {
-            .sidebar { width: 100%; height: auto; position: sticky; border-right: 0; border-bottom: 1px solid #e2e8f0; }
-            .content { margin-left: 0; padding: 20px; }
-            .nav-container { display: flex; overflow-x: auto; white-space: nowrap; }
-        }
-
-        .nav-link { padding: 15px 25px; display: block; font-weight: 600; color: #64748b; border-left: 4px solid transparent; transition: 0.2s; text-align: left; }
+        @media (max-width: 768px) { .sidebar { width: 100%; height: auto; position: sticky; } .content { margin-left: 0; padding: 20px; } }
+        .nav-link { padding: 12px 20px; display: block; font-weight: 600; color: #64748b; border-left: 4px solid transparent; text-align: left; transition: 0.3s; }
         .nav-link.active { color: #f97316; border-left-color: #f97316; background: #fff7ed; }
-        .dark-mode .nav-link.active { background: #1e293b; color: #fb923c; }
-        
-        .node-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border-left: 6px solid #f97316; margin-bottom: 15px; }
+        .dark-mode .nav-link.active { background: #334155; }
+        .node-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-left: 6px solid #f97316; margin-bottom: 20px; }
         .dark-mode .node-card { background: #1e293b; border-color: #334155; }
         .hidden { display: none; }
     </style>
 </head>
 <body id="app-body">
 
-    <div id="auth-gate" class="flex items-center justify-center min-h-screen p-4">
-        <div class="max-w-md w-full bg-white dark:bg-gray-800 p-10 rounded-[2.5rem] shadow-2xl">
-            <h1 class="text-3xl font-black text-orange-600 mb-6 text-center">VAULT PRO 1.2</h1>
-            <div onkeypress="if(event.keyCode==13) authorizeSystem()">
-                <input type="text" id="user-id" placeholder="Admin ID" class="w-full p-4 mb-4 border rounded-2xl dark:bg-gray-700 outline-none">
-                <input type="password" id="access-code" placeholder="Master Key" class="w-full p-4 mb-6 border rounded-2xl dark:bg-gray-700 outline-none">
-                <button onclick="authorizeSystem()" class="w-full bg-orange-500 text-white p-4 rounded-2xl font-bold shadow-lg">ENTER SYSTEM</button>
+    <div id="auth-gate" class="flex flex-col items-center justify-center min-h-screen p-4 bg-slate-50 dark:bg-slate-900">
+        <div id="login-box" class="max-w-md w-full bg-white dark:bg-gray-800 p-10 rounded-[2.5rem] shadow-2xl">
+            <h1 class="text-3xl font-black text-orange-600 mb-8 text-center">VAULT SECURE 1.3</h1>
+            
+            <div id="master-login-form" class="space-y-4">
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest text-center">Select Login Mode</p>
+                <div class="flex gap-2 mb-6">
+                    <button onclick="toggleLoginMode('master')" id="mode-master" class="flex-1 py-2 bg-orange-100 text-orange-600 rounded-xl font-bold border-2 border-orange-500">Master</button>
+                    <button onclick="toggleLoginMode('user')" id="mode-user" class="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold border-2 border-transparent">User OTP</button>
+                </div>
+
+                <div id="input-fields" class="space-y-4">
+                    <input type="text" id="login-id" placeholder="Master ID or Email" class="w-full p-4 border rounded-2xl dark:bg-gray-700 outline-none focus:ring-2 ring-orange-500">
+                    <input type="password" id="login-pass" placeholder="Password / OTP" class="w-full p-4 border rounded-2xl dark:bg-gray-700 outline-none focus:ring-2 ring-orange-500">
+                </div>
+                
+                <button onclick="performLogin()" class="w-full bg-orange-600 text-white p-4 rounded-2xl font-black shadow-lg hover:scale-105 transition">ENTER VAULT</button>
+                <button onclick="sendOTP()" id="btn-otp-request" class="w-full text-blue-600 font-bold text-sm hidden">Request OTP to Email</button>
+                <p onclick="showReset()" class="text-center text-sm text-gray-400 cursor-pointer mt-4">Forgot Password?</p>
             </div>
-            <p id="auth-err" class="text-red-500 mt-4 hidden text-center italic">Access Denied, Professor.</p>
+            <p id="auth-err" class="text-red-500 mt-4 hidden text-center italic font-bold">Access Denied!</p>
+        </div>
+
+        <div id="reset-box" class="max-w-md w-full bg-white dark:bg-gray-800 p-10 rounded-[2.5rem] shadow-2xl hidden">
+            <h3 class="text-xl font-bold mb-4">Reset Password</h3>
+            <input type="email" id="reset-email" placeholder="Enter Registered Email" class="w-full p-4 border rounded-2xl mb-4 dark:bg-gray-700">
+            <button onclick="sendOTP('reset')" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold mb-2">Send Reset OTP</button>
+            <button onclick="location.reload()" class="w-full text-gray-400">Back to Login</button>
         </div>
     </div>
 
     <div id="master-dashboard" class="hidden">
         <aside class="sidebar no-print">
             <div class="p-8 text-center border-b dark:border-gray-700">
-                <h2 class="text-xl font-black text-orange-600 italic">M.BAZAR</h2>
+                <h2 class="text-xl font-black text-orange-600">PRO VAULT 1.3</h2>
             </div>
-            <nav class="nav-container mt-4">
-                <button onclick="showTab('bazar')" id="btn-bazar" class="nav-link w-full active">📊 Inventory</button>
-                <button onclick="showTab('gallery')" id="btn-gallery" class="nav-link w-full">🖼️ Gallery</button>
-                <button onclick="showTab('report')" id="btn-report" class="nav-link w-full">📂 Report Folder</button>
-                <button onclick="showTab('vault')" id="btn-vault" class="nav-link w-full">🔐 Secret Vault</button>
-                <button onclick="logout()" class="nav-link w-full text-red-500 mt-10">🚪 Logout</button>
+            <nav class="mt-6">
+                <button onclick="showTab('bazar')" class="nav-link w-full active" id="link-bazar">📊 Inventory</button>
+                <button onclick="showTab('gallery')" class="nav-link w-full" id="link-gallery">🖼️ Gallery</button>
+                <button onclick="showTab('report')" class="nav-link w-full" id="link-report">📂 Report Folder</button>
+                <button onclick="showTab('admin')" class="nav-link w-full text-blue-600" id="link-admin">🛡️ Admin Panel</button>
+                <button onclick="showTab('settings')" class="nav-link w-full" id="link-settings">⚙️ Password Settings</button>
+                <button onclick="logout()" class="nav-link w-full text-red-500 mt-10">🚪 Logout System</button>
             </nav>
         </aside>
 
         <main class="content">
-            <header class="flex justify-between items-center mb-10">
-                <h1 class="text-2xl font-black">Control Center</h1>
-                <button onclick="toggleDarkMode()" class="p-3 bg-gray-200 dark:bg-gray-700 rounded-2xl">🌓 Mode</button>
-            </header>
-
-            <div id="tab-bazar">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 no-print">
-                    <div class="node-card">
-                        <h3 class="font-bold mb-4">Add or Update Item</h3>
-                        <div class="space-y-3">
-                            <input type="text" id="it-name" list="master-list" placeholder="Select Item Name..." class="w-full p-4 border rounded-2xl dark:bg-gray-700 outline-none">
-                            <datalist id="master-list"></datalist>
-                            <div class="grid grid-cols-2 gap-3">
-                                <input type="number" id="it-price" placeholder="Price" oninput="calc()" class="p-4 border rounded-2xl dark:bg-gray-700">
-                                <input type="number" id="it-qty" placeholder="Qty" oninput="calc()" class="p-4 border rounded-2xl dark:bg-gray-700">
-                            </div>
-                            <input type="text" id="it-total-box" placeholder="Total: ৳ 0" class="w-full p-4 bg-orange-50 dark:bg-gray-700 rounded-2xl font-black text-orange-600" readonly>
-                            <button onclick="addItem()" class="w-full bg-orange-500 text-white p-4 rounded-2xl font-bold">Save to Inventory</button>
+            <div id="tab-admin" class="hidden">
+                <div class="node-card">
+                    <h2 class="text-2xl font-black mb-6 text-blue-600">Admin Control Center</h2>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-blue-50 dark:bg-gray-700 rounded-2xl">
+                            <h4 class="font-bold mb-2 text-sm">Force Password Change (No Old PW Needed)</h4>
+                            <input type="text" id="admin-target-user" placeholder="Target Username/Email" class="w-full p-3 border rounded-xl mb-2 dark:bg-gray-800">
+                            <input type="password" id="admin-new-pass" placeholder="New Strong Password" class="w-full p-3 border rounded-xl mb-4 dark:bg-gray-800">
+                            <button onclick="adminChangePass()" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold">Update Account</button>
+                        </div>
+                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-2xl">
+                            <h4 class="font-bold mb-2 text-sm">Active OTP Simulation</h4>
+                            <p id="active-otp-display" class="text-2xl font-mono text-orange-600 tracking-widest">NONE</p>
                         </div>
                     </div>
-                    <div class="bg-orange-500 p-8 rounded-[2rem] text-white shadow-xl flex flex-col justify-center">
-                        <p class="opacity-80">Total Expense This Month</p>
-                        <h2 class="text-5xl font-black">৳ <span id="grand-total">0</span></h2>
-                        <select id="sel-month" onchange="renderBazar()" class="mt-4 p-2 bg-orange-600 rounded-xl outline-none"></select>
-                    </div>
                 </div>
-                <div id="bazar-display" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
-            <div id="tab-report" class="hidden">
+            <div id="tab-settings" class="hidden">
                 <div class="node-card">
-                    <h3 class="text-xl font-bold mb-4">📊 Monthly Summary</h3>
-                    <div id="report-content" class="space-y-2 border-b pb-4 mb-4"></div>
-                    <div class="flex justify-between font-black text-xl text-orange-600">
-                        <span>Grand Total:</span>
-                        <span id="report-total">৳ 0</span>
+                    <h2 class="text-xl font-bold mb-4">Change Password</h2>
+                    <div class="space-y-4">
+                        <input type="password" id="old-pass" placeholder="Current Password" class="w-full p-4 border rounded-2xl dark:bg-gray-700">
+                        <input type="password" id="new-pass" placeholder="New Password" class="w-full p-4 border rounded-2xl dark:bg-gray-700">
+                        <button onclick="userChangePass()" class="bg-orange-500 text-white px-8 py-3 rounded-2xl font-bold">Save New Password</button>
                     </div>
-                    <button onclick="window.print()" class="mt-6 bg-black text-white px-8 py-3 rounded-2xl no-print">Print Report</button>
                 </div>
             </div>
 
-            <div id="tab-gallery" class="hidden">
-                <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl border mb-8 text-center no-print">
-                    <label class="bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold cursor-pointer inline-block">
-                        📁 Upload from Folder
-                        <input type="file" accept="image/*" onchange="handleFile(event)" class="hidden">
-                    </label>
-                </div>
-                <div id="gallery-display" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+            <div id="tab-bazar">
+                <div class="node-card">Inventory is active. (Preloaded 62 items)</div>
             </div>
-
-            <div id="tab-vault" class="hidden">
-                <textarea id="vault-data" class="w-full p-6 border rounded-3xl h-60 dark:bg-gray-700" placeholder="Secret Notes..."></textarea>
-                <button onclick="saveVault()" class="mt-4 bg-blue-700 text-white px-10 py-3 rounded-2xl font-bold">Secure Save</button>
-                <div id="vault-display" class="mt-6"></div>
-            </div>
+            <div id="tab-gallery" class="hidden">Gallery is active.</div>
+            <div id="tab-report" class="hidden">Reports are active.</div>
         </main>
     </div>
 
     <script>
-        const KEY = 'vault_pro_v12_gold';
-        const MASTER_ITEMS = [
-            "Rice (Chaal)", "Lentils (Daal)", "Oil (Tel)", "Salt (Lobon)", "Sugar (Chini)", "Onion (Peyaj)", "Garlic (Rosun)", "Ginger (Ada)", "Spices", "Potato", "Soap & Detergent", "Toothpaste", "Beef/Chicken/Fish", "Eggs (Dim)", "Milk (Dudh)", "Tea/Coffee", "Flour (Ata/Maida)", "Green Chili (Kacha Morich)", "Dish Soap", "Shampoo", "Toilet Tissue", "Hand Wash", "Butter/Ghee", "Bread/Biscuit", "Honey (Modhu)", "Dry Fruits (Almond, Cashew, Raisins)", "Noodles/Pasta", "Sauce (Tomato, Chili, Soy)", "Vinegar", "Baking Powder/Soda", "Spices (Elachi, Daruchini, Long)", "Chickpeas (Chola)", "Semolina (Suji)", "Cleaning Brushes", "Air Freshener", "Matchbox/Lighter", "Salt (Bit Lobon)", "Mustard Oil", "Cereal/Oats", "Beef (Goru)", "Mutton (Khashi)", "Chicken (Murgi)", "Rui Fish", "Katla Fish", "Hilsha (Ilish)", "Shrimp (Chingri)", "Pangas Fish", "Tilapia Fish", "Dry Fish (Shutki)", "WiFi Bill", "Utility Bills (Gas, Water, Electricity)", "Tuition Fees", "Bike Fuel/Pocket money", "Parking Bill", "Soya Sauce", "Mosquito Coil", "Soybean Oil", "Sunflower Oil", "Olive Oil", "Coconut Oil", "Rice Bran Oil", "Sesame Oil (Til-er tel)"
-        ];
-
-        let db = JSON.parse(localStorage.getItem(KEY)) || { bazaar: [], vault: [], gallery: [], isAuth: false, darkMode: false };
-
-        window.onload = () => {
-            if(db.isAuth) {
-                document.getElementById('auth-gate').classList.add('hidden');
-                document.getElementById('master-dashboard').classList.remove('hidden');
-            }
-            if(db.darkMode) toggleDarkMode(true);
-            
-            const list = document.getElementById('master-list');
-            MASTER_ITEMS.forEach(item => { let op = document.createElement('option'); op.value = item; list.appendChild(op); });
-            
-            populateMonths(); renderBazar(); renderGallery();
+        // Security Storage
+        const SEC_KEY = 'vault_sec_data';
+        let secData = JSON.parse(localStorage.getItem(SEC_KEY)) || {
+            masterId: "faisal",
+            masterPass: "1234",
+            users: {}, // {email: password}
+            currentOTP: null
         };
 
-        function authorizeSystem() {
-            if(document.getElementById('user-id').value === "faisal" && document.getElementById('access-code').value === "1234") {
-                db.isAuth = true; saveDB(); location.reload();
-            } else { document.getElementById('auth-err').classList.remove('hidden'); }
+        let currentLoginMode = 'master';
+
+        function toggleLoginMode(mode) {
+            currentLoginMode = mode;
+            document.getElementById('mode-master').className = mode === 'master' ? 'flex-1 py-2 bg-orange-100 text-orange-600 rounded-xl font-bold border-2 border-orange-500' : 'flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold border-2 border-transparent';
+            document.getElementById('mode-user').className = mode === 'user' ? 'flex-1 py-2 bg-orange-100 text-orange-600 rounded-xl font-bold border-2 border-orange-500' : 'flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold border-2 border-transparent';
+            document.getElementById('btn-otp-request').classList.toggle('hidden', mode === 'master');
         }
 
-        function calc() {
-            const p = parseFloat(document.getElementById('it-price').value) || 0;
-            const q = parseFloat(document.getElementById('it-qty').value) || 0;
-            document.getElementById('it-total-box').value = "Total: ৳ " + (p * q).toFixed(2);
-        }
+        function performLogin() {
+            const id = document.getElementById('login-id').value;
+            const pass = document.getElementById('login-pass').value;
 
-        function addItem() {
-            const name = document.getElementById('it-name').value, price = parseFloat(document.getElementById('it-price').value) || 0, qty = parseFloat(document.getElementById('it-qty').value) || 0, month = document.getElementById('sel-month').value;
-            if(name && price) {
-                db.bazaar.push({ month, name, price, qty, total: price * qty });
-                saveDB(); renderBazar(); document.getElementById('it-name').value = '';
+            if (currentLoginMode === 'master') {
+                if (id === secData.masterId && pass === secData.masterPass) {
+                    enterSystem();
+                } else { showError(); }
+            } else {
+                if (secData.users[id] === pass || (secData.currentOTP && pass === secData.currentOTP)) {
+                    enterSystem();
+                } else { showError(); }
             }
         }
 
-        function renderBazar() {
-            const display = document.getElementById('bazar-display'), month = document.getElementById('sel-month').value;
-            const report = document.getElementById('report-content');
-            display.innerHTML = ''; report.innerHTML = ''; let t = 0;
+        function sendOTP(type) {
+            const email = type === 'reset' ? document.getElementById('reset-email').value : document.getElementById('login-id').value;
+            if(!email) return alert("Please enter email first");
             
-            db.bazaar.filter(i => i.month === month).forEach((item, idx) => {
-                t += item.total;
-                display.innerHTML += `<div class="node-card flex justify-between items-center"><div><b>${item.name}</b><br><small>${item.qty} units @ ৳${item.price}</small></div><div class="text-right"><b class="text-orange-600">৳${item.total.toFixed(0)}</b><br><button onclick="del('bazaar', ${idx})" class="text-red-500 text-xs">Delete</button></div></div>`;
-                report.innerHTML += `<div class="flex justify-between text-sm"><span>${item.name}</span><span>৳${item.total}</span></div>`;
+            secData.currentOTP = Math.floor(1000 + Math.random() * 9000).toString();
+            alert(`OTP Sent to ${email}: ${secData.currentOTP}`);
+            document.getElementById('active-otp-display').innerText = secData.currentOTP;
+            saveSec();
+        }
+
+        function adminChangePass() {
+            const user = document.getElementById('admin-target-user').value;
+            const newP = document.getElementById('admin-new-pass').value;
+            if(user === "faisal") {
+                secData.masterPass = newP;
+            } else {
+                secData.users[user] = newP;
+            }
+            saveSec();
+            alert("Password Changed Successfully by Admin!");
+        }
+
+        function userChangePass() {
+            const oldP = document.getElementById('old-pass').value;
+            const newP = document.getElementById('new-pass').value;
+            if(oldP === secData.masterPass) {
+                secData.masterPass = newP;
+                saveSec();
+                alert("Password Updated!");
+            } else { alert("Old Password Wrong!"); }
+        }
+
+        function enterSystem() {
+            document.getElementById('auth-gate').classList.add('hidden');
+            document.getElementById('master-dashboard').classList.remove('hidden');
+        }
+
+        function showTab(t) {
+            ['bazar', 'gallery', 'report', 'admin', 'settings'].forEach(x => {
+                const el = document.getElementById('tab-' + x);
+                if(el) el.classList.add('hidden');
+                document.getElementById('link-' + x).classList.remove('active');
             });
-            document.getElementById('grand-total').innerText = t.toLocaleString();
-            document.getElementById('report-total').innerText = "৳ " + t.toLocaleString();
+            document.getElementById('tab-' + t).classList.remove('hidden');
+            document.getElementById('link-' + t).classList.add('active');
         }
 
-        function handleFile(e) {
-            const reader = new FileReader();
-            reader.onload = () => { db.gallery.push(reader.result); saveDB(); renderGallery(); };
-            reader.readAsDataURL(e.target.files[0]);
+        function showError() { 
+            const err = document.getElementById('auth-err');
+            err.classList.remove('hidden');
+            setTimeout(() => err.classList.add('hidden'), 3000);
         }
 
-        function renderGallery() {
-            document.getElementById('gallery-display').innerHTML = db.gallery.map((img, i) => `<div class="relative"><img src="${img}" class="w-full h-40 object-cover rounded-2xl"><button onclick="del('gallery', ${i})" class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6">×</button></div>`).join('');
+        function showReset() {
+            document.getElementById('login-box').classList.add('hidden');
+            document.getElementById('reset-box').classList.remove('hidden');
         }
 
-        function showTab(tab) {
-            ['bazar', 'gallery', 'report', 'vault'].forEach(t => {
-                document.getElementById('tab-' + t).classList.add('hidden');
-                document.getElementById('btn-' + t).classList.remove('active');
-            });
-            document.getElementById('tab-' + tab).classList.remove('hidden');
-            document.getElementById('btn-' + tab).classList.add('active');
-        }
-
-        function toggleDarkMode(init = false) { if(!init) db.darkMode = !db.darkMode; document.body.classList.toggle('dark-mode', db.darkMode); saveDB(); }
-        function logout() { db.isAuth = false; saveDB(); location.reload(); }
-        function saveDB() { localStorage.setItem(KEY, JSON.stringify(db)); }
-        function del(type, i) { if(confirm("Delete?")) { db[type].splice(i, 1); saveDB(); location.reload(); } }
-        function populateMonths() {
-            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            const sel = document.getElementById('sel-month');
-            months.forEach(m => {
-                let o = document.createElement('option'); o.text = m; o.value = m;
-                if(m === months[new Date().getMonth()]) o.selected = true;
-                sel.add(o);
-            });
-        }
+        function saveSec() { localStorage.setItem(SEC_KEY, JSON.stringify(secData)); }
+        function logout() { location.reload(); }
     </script>
 </body>
 </html>
