@@ -6,45 +6,43 @@
     <title>Personal Vault Pro 1.2 - Master Faisal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Futuristic Start-up */
-        @keyframes startUp {
-            0% { opacity: 0; filter: brightness(0.1); transform: scale(0.98); }
+        @keyframes startupFade {
+            0% { opacity: 0; filter: brightness(0); transform: scale(0.98); }
             100% { opacity: 1; filter: brightness(1); transform: scale(1); }
         }
-        body { animation: startUp 1.2s ease-in-out; background-color: #f8fafc; font-family: 'Inter', sans-serif; transition: 0.4s; }
+        body { animation: startupFade 1.2s ease-out; background-color: #f8fafc; font-family: 'Inter', sans-serif; transition: 0.4s; }
         .dark-mode { background-color: #0f172a !important; color: #f1f5f9; }
-
-        /* Vertical Sidebar Layout */
-        .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: #ffffff; border-right: 1px solid #e2e8f0; z-index: 50; }
+        
+        .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: white; border-right: 1px solid #e2e8f0; z-index: 50; }
         .dark-mode .sidebar { background: #1e293b; border-color: #334155; }
-        .main-content { margin-left: 260px; padding: 40px; min-height: 100vh; }
-
+        .content { margin-left: 260px; padding: 40px; min-height: 100vh; }
+        
         @media (max-width: 768px) {
             .sidebar { width: 100%; height: auto; position: sticky; border-right: 0; border-bottom: 1px solid #e2e8f0; }
-            .main-content { margin-left: 0; padding: 20px; }
-            .nav-list { display: flex; overflow-x: auto; white-space: nowrap; }
+            .content { margin-left: 0; padding: 20px; }
+            .nav-container { display: flex; overflow-x: auto; white-space: nowrap; }
         }
 
-        .nav-link { padding: 15px 25px; display: block; font-weight: 600; color: #64748b; border-left: 4px solid transparent; transition: 0.3s; text-align: left; }
+        .nav-link { padding: 15px 25px; display: block; font-weight: 600; color: #64748b; border-left: 4px solid transparent; transition: 0.2s; text-align: left; }
         .nav-link.active { color: #f97316; border-left-color: #f97316; background: #fff7ed; }
         .dark-mode .nav-link.active { background: #1e293b; color: #fb923c; }
         
-        .node-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-left: 6px solid #f97316; margin-bottom: 20px; }
+        .node-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border-left: 6px solid #f97316; margin-bottom: 20px; }
         .dark-mode .node-card { background: #1e293b; border-color: #334155; }
         .hidden { display: none; }
     </style>
 </head>
 <body id="app-body">
 
-    <div id="auth-gate" class="flex items-center justify-center min-h-screen p-4 bg-slate-100 dark:bg-slate-900">
+    <div id="auth-gate" class="flex items-center justify-center min-h-screen p-4">
         <div class="max-w-md w-full bg-white dark:bg-gray-800 p-10 rounded-[2.5rem] shadow-2xl">
-            <h1 class="text-4xl font-black text-orange-600 mb-8 text-center tracking-tighter">VAULT PRO 1.2</h1>
+            <h1 class="text-4xl font-black text-orange-600 mb-8 text-center">VAULT PRO 1.2</h1>
             <div onkeypress="if(event.keyCode==13) authorizeSystem()">
-                <input type="text" id="user-id" placeholder="Identity" class="w-full p-4 mb-4 border rounded-2xl dark:bg-gray-700 outline-none focus:ring-2 ring-orange-500">
+                <input type="text" id="user-id" placeholder="Admin ID" class="w-full p-4 mb-4 border rounded-2xl dark:bg-gray-700 outline-none focus:ring-2 ring-orange-500">
                 <input type="password" id="access-code" placeholder="Master Key" class="w-full p-4 mb-8 border rounded-2xl dark:bg-gray-700 outline-none focus:ring-2 ring-orange-500">
-                <button onclick="authorizeSystem()" class="w-full bg-orange-600 text-white p-5 rounded-2xl font-black text-lg hover:bg-orange-700 transition-all shadow-xl">LOG IN</button>
+                <button onclick="authorizeSystem()" class="w-full bg-orange-500 text-white p-5 rounded-2xl font-bold hover:bg-orange-600 transition shadow-lg">ENTER SYSTEM</button>
             </div>
-            <p id="auth-err" class="text-red-500 mt-5 hidden text-center italic">Key Mismatch. Try again, Professor.</p>
+            <p id="auth-err" class="text-red-500 mt-4 hidden text-center italic">Access Denied, Master.</p>
         </div>
     </div>
 
@@ -53,56 +51,61 @@
             <div class="p-10 text-center border-b dark:border-gray-700">
                 <h2 class="text-2xl font-black text-orange-600 italic">M.BAZAR</h2>
             </div>
-            <nav class="nav-list mt-6">
+            <nav class="nav-container mt-6">
                 <button onclick="showTab('bazar')" id="btn-bazar" class="nav-link w-full active">📊 Inventory</button>
                 <button onclick="showTab('gallery')" id="btn-gallery" class="nav-link w-full">🖼️ Gallery</button>
+                <button onclick="showTab('report')" id="btn-report" class="nav-link w-full">📂 Report Folder</button>
                 <button onclick="showTab('vault')" id="btn-vault" class="nav-link w-full">🔐 Secret Vault</button>
-                <button onclick="showTab('guide')" id="btn-guide" class="nav-link w-full">📖 User Guide</button>
                 <button onclick="logout()" class="nav-link w-full text-red-500 mt-20">🚪 Logout</button>
             </nav>
         </aside>
 
-        <main class="main-content">
-            <header class="flex justify-between items-center mb-12">
-                <div>
-                    <h1 class="text-3xl font-black">Control Center</h1>
-                    <p class="text-gray-500 dark:text-gray-400">System Version 1.2 Gold</p>
-                </div>
-                <button onclick="toggleDarkMode()" class="p-4 bg-white dark:bg-gray-800 rounded-3xl shadow-sm">🌓</button>
+        <main class="content">
+            <header class="flex justify-between items-center mb-10">
+                <h1 class="text-2xl font-black">Welcome, Professor</h1>
+                <button onclick="toggleDarkMode()" class="p-3 bg-gray-200 dark:bg-gray-700 rounded-2xl">🌓 Mode</button>
             </header>
 
             <div id="tab-bazar">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-                    <div class="node-card">
-                        <h3 class="font-bold text-lg mb-6">New Record Entry</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 no-print">
+                    <div class="bg-white dark:bg-gray-800 p-8 rounded-[2rem] border">
+                        <h3 class="font-bold mb-4">Add New Record</h3>
                         <div class="space-y-4">
-                            <input type="text" id="it-name" list="defaults" placeholder="Item Name (e.g. Fish, Meat, Internet)" class="w-full p-4 border rounded-2xl dark:bg-gray-700">
-                            <datalist id="defaults">
+                            <input type="text" id="it-name" list="bazar-items" placeholder="Item Name..." class="w-full p-4 border rounded-2xl dark:bg-gray-700">
+                            <datalist id="bazar-items">
                                 <option value="Fish (মাছ)"> <option value="Meat (মাংস)"> <option value="Medicine">
-                                <option value="Electricity Bill"> <option value="Tution Bill"> <option value="Grocery Box">
+                                <option value="Electricity Bill"> <option value="WiFi Bill"> <option value="Tuition Fees">
+                                <option value="Rice (Chaal)"> <option value="Lentils (Daal)"> <option value="Oil (Tel)">
                             </datalist>
                             <div class="grid grid-cols-2 gap-4">
-                                <input type="number" id="it-price" placeholder="Unit Price" oninput="calcTotal()" class="p-4 border rounded-2xl dark:bg-gray-700">
-                                <input type="number" id="it-qty" placeholder="Quantity" oninput="calcTotal()" class="p-4 border rounded-2xl dark:bg-gray-700">
+                                <input type="number" id="it-price" placeholder="Price" oninput="calcTotal()" class="p-4 border rounded-2xl dark:bg-gray-700">
+                                <input type="number" id="it-qty" placeholder="Qty" oninput="calcTotal()" class="p-4 border rounded-2xl dark:bg-gray-700">
                             </div>
-                            <input type="text" id="it-total-box" placeholder="Total: ৳ 0" class="w-full p-4 bg-orange-50 dark:bg-gray-700 rounded-2xl font-black text-orange-600" readonly>
-                            <button onclick="addItem()" class="w-full bg-orange-600 text-white p-4 rounded-2xl font-bold hover:scale-[1.02] transition">Add To Inventory</button>
+                            <input type="text" id="it-total-box" placeholder="Total: ৳ 0" class="w-full p-4 bg-gray-100 dark:bg-gray-700 rounded-2xl font-black" readonly>
+                            <button onclick="addItem()" class="w-full bg-orange-500 text-white p-4 rounded-2xl font-bold">Add to List</button>
                         </div>
                     </div>
-                    <div class="bg-orange-600 p-10 rounded-[2.5rem] text-white shadow-2xl flex flex-col justify-center">
-                        <p class="text-xl opacity-80 mb-2">Grand Total This Month</p>
-                        <h2 class="text-6xl font-black mb-6">৳ <span id="total-val">0</span></h2>
-                        <select id="sel-month" onchange="renderBazar()" class="bg-orange-700 p-3 rounded-2xl outline-none font-bold"></select>
+                    <div class="bg-orange-500 p-10 rounded-[2rem] text-white flex flex-col justify-center shadow-xl">
+                        <p class="opacity-80">Total Expense This Month</p>
+                        <h2 class="text-6xl font-black">৳ <span id="grand-total">0</span></h2>
+                        <select id="sel-month" onchange="renderBazar()" class="mt-6 p-2 bg-orange-600 rounded-xl outline-none font-bold"></select>
                     </div>
                 </div>
                 <div id="bazar-display" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
+            <div id="tab-report" class="hidden">
+                <div class="node-card">
+                    <h3 class="text-xl font-bold mb-4">📊 Monthly Spending Report</h3>
+                    <div id="report-summary" class="space-y-2 mb-6"></div>
+                    <button onclick="window.print()" class="bg-black text-white px-8 py-3 rounded-2xl font-bold">Print/Export Report</button>
+                </div>
+            </div>
+
             <div id="tab-gallery" class="hidden">
-                <div class="node-card text-center py-10 no-print">
-                    <p class="text-gray-500 mb-6 font-semibold">Security Folder: Upload images from your local device</p>
-                    <label class="bg-blue-600 text-white px-12 py-5 rounded-2xl font-black cursor-pointer inline-block hover:shadow-lg transition">
-                        📁 SELECT FILES
+                <div class="bg-white dark:bg-gray-800 p-10 rounded-[2rem] border mb-10 text-center no-print">
+                    <label class="bg-blue-600 text-white px-10 py-5 rounded-2xl font-black cursor-pointer inline-block">
+                        📁 Choose Image File
                         <input type="file" id="img-input" accept="image/*" onchange="handleFile(event)" class="hidden">
                     </label>
                 </div>
@@ -110,27 +113,16 @@
             </div>
 
             <div id="tab-vault" class="hidden">
-                <textarea id="vault-data" class="w-full p-6 border rounded-3xl h-60 dark:bg-gray-800 text-lg" placeholder="Enter sensitive information here..."></textarea>
-                <button onclick="saveVault()" class="mt-6 bg-blue-700 text-white px-10 py-4 rounded-2xl font-black">SECURE SAVE</button>
-                <div id="vault-display" class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </div>
-            <div id="tab-guide" class="hidden">
-                <div class="node-card bg-orange-50 dark:bg-gray-800">
-                    <h3 class="text-2xl font-black mb-6 text-orange-600">User Manual V1.2</h3>
-                    <ul class="space-y-4 font-medium opacity-90">
-                        <li>✅ <b>Vertical Menu:</b> সব ফিচার এখন বাম দিকে সহজেই পাবেন।</li>
-                        <li>✅ <b>Auto Calc:</b> দাম ও পরিমাণ লিখলেই মোট টাকা অটোমেটিক দেখাবে।</li>
-                        <li>✅ <b>Local Gallery:</b> ফোন থেকে সরাসরি ছবি আপলোড করে গ্যালারিতে রাখা যাবে।</li>
-                        <li>✅ <b>Startup Effect:</b> অ্যাপটি এখন আরও দ্রুত এবং সুন্দর অ্যানিমেশনে ওপেন হয়।</li>
-                    </ul>
-                </div>
+                <textarea id="vault-data" class="w-full p-6 border rounded-3xl h-60 dark:bg-gray-800" placeholder="Secret Notes..."></textarea>
+                <button onclick="saveVault()" class="mt-4 bg-blue-700 text-white px-10 py-4 rounded-2xl font-bold">Secure Save</button>
+                <div id="vault-display" class="mt-10"></div>
             </div>
         </main>
     </div>
 
     <script>
-        const DB_NAME = 'vault_pro_gold_v12';
-        let db = JSON.parse(localStorage.getItem(DB_NAME)) || { bazaar: [], vault: [], gallery: [], isAuth: false, darkMode: false };
+        const KEY = 'vault_pro_v12_final';
+        let db = JSON.parse(localStorage.getItem(KEY)) || { bazaar: [], vault: [], gallery: [], isAuth: false, darkMode: false };
 
         window.onload = () => {
             if(db.isAuth) {
@@ -169,36 +161,37 @@
 
         function renderBazar() {
             const display = document.getElementById('bazar-display'), month = document.getElementById('sel-month').value;
-            display.innerHTML = ''; let t = 0;
+            const reportSum = document.getElementById('report-summary');
+            display.innerHTML = ''; reportSum.innerHTML = ''; let t = 0;
+            
             db.bazaar.filter(i => i.month === month).forEach((item, idx) => {
                 t += item.total;
-                display.innerHTML += `<div class="node-card flex justify-between items-center"><div><b class="text-lg">${item.name}</b><br><span class="opacity-60 text-sm">${item.qty} units @ ৳${item.price}</span></div><div class="text-right"><b class="text-xl text-orange-600">৳${item.total.toFixed(0)}</b><br><button onclick="del('bazaar', ${idx})" class="text-red-500 text-xs font-bold uppercase tracking-widest mt-2">Delete</button></div></div>`;
+                display.innerHTML += `<div class="node-card flex justify-between items-center"><div><b class="text-lg">${item.name}</b><br><span class="opacity-60">${item.qty} units @ ৳${item.price}</span></div><div class="text-right"><b>৳${item.total.toFixed(0)}</b><br><button onclick="del('bazaar', ${idx})" class="text-red-500 text-xs">Delete</button></div></div>`;
+                reportSum.innerHTML += `<p class="flex justify-between border-b pb-1"><span>${item.name}</span> <b>৳${item.total}</b></p>`;
             });
-            document.getElementById('total-val').innerText = t.toLocaleString();
+            document.getElementById('grand-total').innerText = t.toLocaleString();
+            reportSum.innerHTML += `<h4 class="text-2xl font-black mt-4 text-orange-600">Grand Total: ৳${t}</h4>`;
         }
 
         function renderGallery() {
             document.getElementById('gallery-display').innerHTML = db.gallery.map((img, i) => `
-                <div class="relative group"><img src="${img}" class="w-full h-48 object-cover rounded-3xl shadow-lg border-4 border-white dark:border-gray-700">
-                <button onclick="del('gallery', ${i})" class="absolute top-3 right-3 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">×</button></div>`).join('');
+                <div class="relative group"><img src="${img}" class="w-full h-48 object-cover rounded-[2rem] shadow-lg">
+                <button onclick="del('gallery', ${i})" class="absolute top-3 right-3 bg-red-600 text-white rounded-full w-8 h-8 opacity-0 group-hover:opacity-100 transition">×</button></div>`).join('');
         }
 
-        function showTab(t) {
-            ['bazar', 'gallery', 'vault', 'guide'].forEach(x => {
-                document.getElementById('tab-' + x).classList.add('hidden');
-                document.getElementById('btn-' + x).classList.remove('active');
+        function showTab(tab) {
+            ['bazar', 'gallery', 'vault', 'report'].forEach(t => {
+                document.getElementById('tab-' + t).classList.add('hidden');
+                document.getElementById('btn-' + t).classList.remove('active');
             });
-            document.getElementById('tab-' + t).classList.remove('hidden');
-            document.getElementById('btn-' + t).classList.add('active');
-            if(t === 'vault') renderVault();
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+            document.getElementById('btn-' + tab).classList.add('active');
         }
 
-        function saveVault() { const n = document.getElementById('vault-data').value; if(n) { db.vault.push({ note: n, date: new Date().toLocaleString() }); saveDB(); renderVault(); document.getElementById('vault-data').value = ''; } }
-        function renderVault() { document.getElementById('vault-display').innerHTML = db.vault.map((v, i) => `<div class="node-card"><div class="flex justify-between font-mono"><span>${v.note}</span><button onclick="del('vault', ${i})" class="text-red-500">×</button></div><div class="text-[10px] mt-4 opacity-40 uppercase">${v.date}</div></div>`).join(''); }
         function toggleDarkMode(init = false) { if(!init) db.darkMode = !db.darkMode; document.body.classList.toggle('dark-mode', db.darkMode); saveDB(); }
         function logout() { db.isAuth = false; saveDB(); location.reload(); }
-        function saveDB() { localStorage.setItem(DB_NAME, JSON.stringify(db)); }
-        function del(type, i) { if(confirm("Delete Record?")) { db[type].splice(i, 1); saveDB(); renderBazar(); renderGallery(); renderVault(); } }
+        function saveDB() { localStorage.setItem(KEY, JSON.stringify(db)); }
+        function del(type, i) { if(confirm("Delete?")) { db[type].splice(i, 1); saveDB(); location.reload(); } }
         function populateMonths() {
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             const sel = document.getElementById('sel-month');
