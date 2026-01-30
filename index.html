@@ -10,27 +10,25 @@
         .bazar-header { background: linear-gradient(135deg, #FF8C00, #FFA500); color: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(255,140,0,0.3); }
         .node-card { background: white; border-radius: 10px; padding: 15px; border-left: 6px solid #FF8C00; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); color: #333; }
         .hidden { display: none; }
+        @media print { .no-print { display: none; } #master-dashboard { display: block !important; } }
     </style>
 </head>
 <body class="p-4 md:p-10">
 
-    <div class="text-center text-xs text-gray-400 mb-4">Created by Ahmed Faisal.</div>
+    <div class="text-center text-xs text-gray-400 mb-4 no-print">Created by Ahmed Faisal.</div>
 
-    <div id="auth-gate" class="max-w-md mx-auto mt-20 p-8 bg-white rounded-2xl shadow-xl">
+    <div id="auth-gate" class="max-w-md mx-auto mt-20 p-8 bg-white rounded-2xl shadow-xl no-print">
         <h2 class="text-2xl font-bold mb-6 text-orange-600">Admin Gateway</h2>
-        <input type="text" id="user-id" placeholder="Identity" class="w-full p-3 mb-4 border rounded focus:outline-orange-500">
-        <input type="password" id="access-code" placeholder="Access Code" class="w-full p-3 mb-6 border rounded focus:outline-orange-500">
-        <button onclick="authorizeSystem()" class="w-full bg-orange-500 text-white p-3 rounded-lg font-bold hover:bg-orange-600 transition">AUTHORIZE SYSTEM</button>
-        <p id="auth-err" class="text-red-500 mt-4 hidden text-center italic">Invalid Identity or Access Code.</p>
+        <input type="text" id="user-id" placeholder="Identity" class="w-full p-3 mb-4 border rounded">
+        <input type="password" id="access-code" placeholder="Access Code" class="w-full p-3 mb-6 border rounded">
+        <button onclick="authorizeSystem()" class="w-full bg-orange-500 text-white p-3 rounded-lg font-bold hover:bg-orange-600">AUTHORIZE SYSTEM</button>
+        <p id="auth-err" class="text-red-500 mt-4 hidden text-center italic">Invalid Identity.</p>
     </div>
 
     <div id="master-dashboard" class="hidden max-w-5xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div class="flex justify-between items-center mb-6 no-print">
             <h1 class="text-2xl font-bold text-orange-600">M.Bazar AI Pro V8.6</h1>
-            <div class="flex gap-2">
-                <input type="password" id="hero-check" onkeyup="checkTony()" placeholder="Hero Challenge (Tony)" class="p-2 border rounded text-sm w-40">
-                <button onclick="location.reload()" class="bg-gray-200 px-3 py-1 rounded text-sm">Logout</button>
-            </div>
+            <input type="password" id="hero-check" onkeyup="checkTony()" placeholder="Hero Challenge (Tony)" class="p-2 border rounded text-sm w-40">
         </div>
 
         <div id="tony-content" class="hidden">
@@ -38,15 +36,15 @@
                 <h1 class="text-3xl font-bold">M.Bazar - Smart Inventory</h1>
             </div>
 
-            <div class="flex space-x-2 md:space-x-4 mb-6 border-b overflow-x-auto">
-                <button id="btn-bazar" onclick="showTab('bazar')" class="py-2 px-4 font-bold border-b-2 border-orange-500 text-orange-600">Inventory</button>
-                <button id="btn-vault" onclick="showTab('vault')" class="py-2 px-4 font-bold border-b-2 border-transparent">Vault</button>
-                <button id="btn-jobs" onclick="showTab('jobs')" class="py-2 px-4 font-bold border-b-2 border-transparent">Daily Jobs</button>
+            <div class="flex space-x-4 mb-6 border-b no-print">
+                <button onclick="showTab('bazar')" class="py-2 px-4 font-bold border-b-2 border-orange-500">Inventory</button>
+                <button onclick="showTab('vault')" class="py-2 px-4 font-bold border-b-2 border-transparent">Vault</button>
+                <button onclick="showTab('jobs')" class="py-2 px-4 font-bold border-b-2 border-transparent">Jobs & Backup</button>
             </div>
 
             <div id="tab-bazar">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <select id="sel-month" onchange="renderBazar()" class="p-3 border rounded shadow-sm font-semibold">
+                    <select id="sel-month" onchange="renderBazar()" class="p-3 border rounded font-semibold no-print">
                         <option>January</option><option>February</option><option>March</option>
                         <option>April</option><option>May</option><option>June</option>
                         <option>July</option><option>August</option><option>September</option>
@@ -57,135 +55,107 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border mb-6 no-print">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <input type="text" id="it-name" placeholder="Item Name" class="p-2 border rounded">
-                        <input type="number" id="it-price" placeholder="Unit Price (৳)" class="p-2 border rounded">
-                        <input type="number" id="it-qty" placeholder="Quantity" class="p-2 border rounded">
-                        <select id="it-unit" class="p-2 border rounded">
-                            <option>KG</option><option>GM</option><option>Litre</option><option>Packet</option><option>Piece</option>
-                        </select>
+                        <input type="number" id="it-price" placeholder="Price (৳)" class="p-2 border rounded">
+                        <input type="number" id="it-qty" placeholder="Qty" class="p-2 border rounded">
+                        <select id="it-unit" class="p-2 border rounded"><option>KG</option><option>GM</option><option>Litre</option><option>Piece</option></select>
                     </div>
-                    <button onclick="addBazarItem()" class="mt-4 bg-green-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-600 transition">Add to Inventory</button>
+                    <button onclick="addBazarItem()" class="mt-4 bg-green-500 text-white px-6 py-2 rounded-lg font-bold">Add Item</button>
+                    <button onclick="window.print()" class="mt-4 bg-gray-600 text-white px-6 py-2 rounded-lg font-bold ml-2">Print Report</button>
                 </div>
-
-                <div id="bazar-display" class="space-y-3"></div>
+                <div id="bazar-display" class="space-y-2"></div>
             </div>
 
             <div id="tab-vault" class="hidden">
-                <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
-                    <h3 class="text-xl font-bold mb-4 text-blue-600">Secure Vault</h3>
-                    <textarea id="vault-data" placeholder="Store secret note or password..." class="w-full p-3 border rounded mb-2 h-24"></textarea>
+                <div class="bg-white p-6 rounded-xl border mb-6 no-print">
+                    <textarea id="vault-data" placeholder="Secret Note..." class="w-full p-3 border rounded mb-2"></textarea>
                     <button onclick="saveVault()" class="bg-blue-600 text-white px-6 py-2 rounded font-bold">Encrypt & Save</button>
                 </div>
-                <div id="vault-display" class="space-y-3"></div>
+                <div id="vault-display"></div>
             </div>
 
             <div id="tab-jobs" class="hidden">
-                <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
-                    <h3 class="text-xl font-bold mb-4 text-purple-600">Job Logs</h3>
-                    <input type="text" id="job-text" placeholder="Task description..." class="w-full p-3 border rounded mb-2">
+                <div class="bg-white p-6 rounded-xl border mb-6 no-print">
+                    <input type="text" id="job-text" placeholder="Task..." class="w-full p-3 border rounded mb-2">
                     <button onclick="addJob()" class="bg-purple-600 text-white px-6 py-2 rounded font-bold">Log Job</button>
                 </div>
-                <div id="job-display" class="space-y-3"></div>
+                <div id="job-display" class="mb-10"></div>
+
+                <div class="mt-10 p-6 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 no-print">
+                    <h3 class="text-lg font-bold mb-4 text-center">System Backup & Recovery</h3>
+                    <div class="flex flex-col md:flex-row gap-4 justify-center">
+                        <button onclick="exportData()" class="bg-black text-white px-6 py-3 rounded-lg font-bold">📥 Download Backup</button>
+                        <label class="bg-blue-500 text-white px-6 py-3 rounded-lg font-bold text-center cursor-pointer">
+                            📤 Restore Data
+                            <input type="file" id="importFile" onchange="importData(event)" class="hidden">
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Database Initialization
         let bazaarData = JSON.parse(localStorage.getItem('m_bazar_v8')) || [];
         let vaultData = JSON.parse(localStorage.getItem('m_vault_v8')) || [];
         let jobData = JSON.parse(localStorage.getItem('m_jobs_v8')) || [];
 
-        // Auth Logic
         function authorizeSystem() {
-            const u = document.getElementById('user-id').value;
-            const p = document.getElementById('access-code').value;
-            if(u === "faisal" && p === "1234") {
+            if(document.getElementById('user-id').value === "faisal" && document.getElementById('access-code').value === "1234") {
                 document.getElementById('auth-gate').classList.add('hidden');
                 document.getElementById('master-dashboard').classList.remove('hidden');
-            } else {
-                document.getElementById('auth-err').classList.remove('hidden');
-            }
+            } else { document.getElementById('auth-err').classList.remove('hidden'); }
         }
 
-        // Tony Protocol
         function checkTony() {
-            const hero = document.getElementById('hero-check').value.toLowerCase();
-            if(hero === "tony") {
+            if(document.getElementById('hero-check').value.toLowerCase() === "tony") {
                 document.getElementById('tony-content').classList.remove('hidden');
                 renderBazar();
             }
         }
 
-        // Navigation
         function showTab(tab) {
-            ['bazar', 'vault', 'jobs'].forEach(t => {
-                document.getElementById('tab-' + t).classList.add('hidden');
-                document.getElementById('btn-' + t).classList.replace('border-orange-500', 'border-transparent');
-                document.getElementById('btn-' + t).classList.replace('text-orange-600', 'text-gray-500');
-            });
+            ['bazar', 'vault', 'jobs'].forEach(t => document.getElementById('tab-' + t).classList.add('hidden'));
             document.getElementById('tab-' + tab).classList.remove('hidden');
-            document.getElementById('btn-' + tab).classList.replace('border-transparent', 'border-orange-500');
-            document.getElementById('btn-' + tab).classList.replace('text-gray-500', 'text-orange-600');
-            
             if(tab === 'bazar') renderBazar();
             if(tab === 'vault') renderVault();
             if(tab === 'jobs') renderJobs();
         }
 
-        // Inventory Logic
         function addBazarItem() {
             const name = document.getElementById('it-name').value;
             const price = parseFloat(document.getElementById('it-price').value);
             const qty = parseFloat(document.getElementById('it-qty').value);
             const unit = document.getElementById('it-unit').value;
             const month = document.getElementById('sel-month').value;
-
-            if(name && price && qty) {
+            if(name && price) {
                 let total = price * qty;
                 if(unit === "GM") total = (price / 1000) * qty;
                 bazaarData.push({ month, name, price, qty, unit, total, date: new Date().toLocaleDateString() });
                 localStorage.setItem('m_bazar_v8', JSON.stringify(bazaarData));
                 renderBazar();
                 document.getElementById('it-name').value = '';
-                document.getElementById('it-price').value = '';
-                document.getElementById('it-qty').value = '';
             }
         }
 
         function renderBazar() {
             const display = document.getElementById('bazar-display');
             const selectedMonth = document.getElementById('sel-month').value;
-            display.innerHTML = '';
-            let monthTotal = 0;
-
-            const filtered = bazaarData.filter(i => i.month === selectedMonth);
-            filtered.forEach((item, idx) => {
+            display.innerHTML = ''; let monthTotal = 0;
+            bazaarData.filter(i => i.month === selectedMonth).forEach((item, idx) => {
                 monthTotal += item.total;
-                display.innerHTML += `
-                    <div class="node-card flex justify-between items-center animate-fade-in">
-                        <div>
-                            <span class="font-bold text-gray-800">${item.name}</span><br>
-                            <small class="text-gray-500">${item.qty} ${item.unit} x ৳${item.price} | ${item.date}</small>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-orange-600 font-bold">৳${item.total.toFixed(2)}</div>
-                            <button onclick="deleteBazar(${bazaarData.indexOf(item)})" class="text-xs text-red-400 hover:text-red-600 underline">Delete</button>
-                        </div>
-                    </div>`;
+                display.innerHTML += `<div class="node-card flex justify-between items-center">
+                    <div><b>${item.name}</b> (${item.qty} ${item.unit})</div>
+                    <div class="text-right"><b>৳${item.total.toFixed(2)}</b> <br> <button onclick="delB(${bazaarData.indexOf(item)})" class="text-red-500 text-xs no-print">Delete</button></div>
+                </div>`;
             });
-            document.getElementById('total-val').innerText = monthTotal.toLocaleString();
+            document.getElementById('total-val').innerText = monthTotal.toFixed(2);
         }
 
-        function deleteBazar(index) {
-            bazaarData.splice(index, 1);
-            localStorage.setItem('m_bazar_v8', JSON.stringify(bazaarData));
-            renderBazar();
-        }
+        function delB(i) { bazaarData.splice(i, 1); localStorage.setItem('m_bazar_v8', JSON.stringify(bazaarData)); renderBazar(); }
 
-        // Vault Logic
         function saveVault() {
             const note = document.getElementById('vault-data').value;
             if(note) {
@@ -195,26 +165,13 @@
                 renderVault();
             }
         }
-
         function renderVault() {
-            const display = document.getElementById('vault-display');
-            display.innerHTML = vaultData.map((v, i) => `
-                <div class="node-card bg-blue-50 border-l-blue-600">
-                    <div class="flex justify-between">
-                        <div class="text-sm font-mono text-gray-700">${v.note}</div>
-                        <button onclick="deleteVault(${i})" class="text-red-400">×</button>
-                    </div>
-                    <div class="text-[10px] text-gray-400 mt-2 italic">${v.date}</div>
-                </div>`).join('');
+            document.getElementById('vault-display').innerHTML = vaultData.map((v, i) => `<div class="node-card">
+                ${v.note} <br><small>${v.date}</small> <button onclick="delV(${i})" class="text-red-500 text-xs float-right no-print">Delete</button>
+            </div>`).join('');
         }
+        function delV(i) { vaultData.splice(i, 1); localStorage.setItem('m_vault_v8', JSON.stringify(vaultData)); renderVault(); }
 
-        function deleteVault(i) {
-            vaultData.splice(i, 1);
-            localStorage.setItem('m_vault_v8', JSON.stringify(vaultData));
-            renderVault();
-        }
-
-        // Jobs Logic
         function addJob() {
             const task = document.getElementById('job-text').value;
             if(task) {
@@ -224,27 +181,33 @@
                 renderJobs();
             }
         }
-
         function renderJobs() {
-            const display = document.getElementById('job-display');
-            display.innerHTML = jobData.map((j, i) => `
-                <div class="node-card border-l-purple-600 flex justify-between">
-                    <span><b>${j.date}:</b> ${j.task}</span>
-                    <button onclick="deleteJob(${i})" class="text-red-400">×</button>
-                </div>`).join('');
+            document.getElementById('job-display').innerHTML = jobData.map((j, i) => `<div class="node-card">
+                ${j.date}: ${j.task} <button onclick="delJ(${i})" class="text-red-500 text-xs float-right">Delete</button>
+            </div>`).join('');
+        }
+        function delJ(i) { jobData.splice(i, 1); localStorage.setItem('m_jobs_v8', JSON.stringify(jobData)); renderJobs(); }
+
+        function exportData() {
+            const allData = { bazaar: bazaarData, vault: vaultData, jobs: jobData };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allData));
+            const a = document.createElement('a'); a.setAttribute("href", dataStr);
+            a.setAttribute("download", "M_Bazar_Backup.json"); a.click();
         }
 
-        function deleteJob(i) {
-            jobData.splice(i, 1);
-            localStorage.setItem('m_jobs_v8', JSON.stringify(jobData));
-            renderJobs();
+        function importData(e) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const imported = JSON.parse(event.target.result);
+                if(confirm("Restore data?")) {
+                    localStorage.setItem('m_bazar_v8', JSON.stringify(imported.bazaar));
+                    localStorage.setItem('m_vault_v8', JSON.stringify(imported.vault));
+                    localStorage.setItem('m_jobs_v8', JSON.stringify(imported.jobs));
+                    location.reload();
+                }
+            };
+            reader.readAsText(e.target.files[0]);
         }
-
-        // Initialize current month
-        window.onload = () => {
-            const currentMonth = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date());
-            document.getElementById('sel-month').value = currentMonth;
-        };
     </script>
 </body>
 </html>
