@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Vault 1.4 - Final Master</title>
+    <title>Pro Vault 1.4.1 - Dynamic OTP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -24,16 +24,19 @@
 
     <div id="auth-gate" class="flex flex-col items-center justify-center min-h-screen p-4 bg-slate-100 dark:bg-slate-900">
         <div class="max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-2xl">
-            <h1 class="text-2xl font-black text-orange-600 mb-6 text-center">PRO VAULT 1.4</h1>
+            <h1 class="text-2xl font-black text-orange-600 mb-6 text-center">PRO VAULT 1.4.1</h1>
             <div class="space-y-4">
                 <div class="flex gap-2 p-1 bg-gray-100 dark:bg-gray-700 rounded-xl">
                     <button onclick="setMode('master')" id="m-master" class="flex-1 py-2 rounded-lg font-bold bg-white text-orange-600 shadow-sm">Master</button>
                     <button onclick="setMode('user')" id="m-user" class="flex-1 py-2 rounded-lg font-bold text-gray-500">OTP Login</button>
                 </div>
-                <input type="text" id="login-id" placeholder="ID or Phone" class="w-full p-4 border rounded-2xl dark:bg-gray-700 outline-none focus:ring-2 ring-orange-500">
+                <input type="text" id="login-id" placeholder="ID or Phone (e.g. 8801...)" class="w-full p-4 border rounded-2xl dark:bg-gray-700 outline-none focus:ring-2 ring-orange-500">
                 <input type="password" id="login-pass" placeholder="Password or OTP" class="w-full p-4 border rounded-2xl dark:bg-gray-700 outline-none">
-                <button onclick="processLogin()" class="w-full bg-orange-600 text-white p-4 rounded-2xl font-black shadow-lg hover:bg-orange-700 transition">LOGIN TO SYSTEM</button>
-                <button onclick="triggerWA()" id="wa-btn" class="w-full bg-green-600 text-white p-3 rounded-2xl font-bold text-sm hidden">💬 Get OTP on WhatsApp</button>
+                
+                <button onclick="processLogin()" class="w-full bg-orange-600 text-white p-4 rounded-2xl font-black shadow-lg">LOGIN TO SYSTEM</button>
+                
+                <button onclick="triggerDynamicWA()" id="wa-btn" class="w-full bg-green-600 text-white p-3 rounded-2xl font-bold text-sm hidden">💬 Get OTP on User's WhatsApp</button>
+                
                 <p id="err-msg" class="text-red-500 text-center hidden font-bold mt-2">Invalid Credentials!</p>
             </div>
         </div>
@@ -55,7 +58,7 @@
 
         <main class="content">
             <header class="flex justify-between items-center mb-8 no-print">
-                <h1 class="text-2xl font-black">Control Center</h1>
+                <h1 class="text-2xl font-black italic">Working for Ultimate Gallery</h1>
                 <button onclick="toggleDark()" class="p-3 bg-gray-200 dark:bg-gray-700 rounded-xl">🌓</button>
             </header>
 
@@ -74,7 +77,7 @@
                             <button onclick="saveItem()" class="w-full bg-orange-500 text-white p-4 rounded-xl font-bold">Add Item</button>
                         </div>
                     </div>
-                    <div class="bg-orange-600 p-8 rounded-3xl text-white">
+                    <div class="bg-orange-600 p-8 rounded-3xl text-white shadow-xl">
                         <p class="text-sm opacity-80">Monthly Total</p>
                         <h2 class="text-5xl font-black">৳ <span id="total-val">0</span></h2>
                         <select id="sel-m" onchange="loadUI()" class="mt-4 bg-orange-700 p-2 rounded-lg outline-none w-full font-bold"></select>
@@ -98,16 +101,15 @@
                     <div class="flex justify-between font-black text-xl mb-6"><span>Total:</span><span id="rep-total">৳ 0</span></div>
                     <div class="flex gap-2 no-print">
                         <button onclick="window.print()" class="bg-black text-white px-6 py-2 rounded-lg">Print</button>
-                        <button onclick="sendWA()" class="bg-green-600 text-white px-6 py-2 rounded-lg">Send WhatsApp</button>
                     </div>
                 </div>
             </div>
 
             <div id="tab-admin" class="hidden">
                 <div class="node-card">
-                    <h2 class="font-bold text-blue-600 mb-4">Admin Dashboard</h2>
-                    <p class="text-sm text-gray-500 mb-2">Current Active OTP:</p>
-                    <div id="otp-display" class="text-3xl font-mono font-bold text-orange-600 bg-orange-50 p-4 rounded-xl inline-block">----</div>
+                    <h2 class="font-bold text-blue-600 mb-4 text-xl">🛡️ Admin Dashboard</h2>
+                    <p class="text-sm text-gray-500 mb-2">Last Generated OTP (for bypass):</p>
+                    <div id="otp-display" class="text-3xl font-mono font-bold text-orange-600 bg-orange-50 p-4 rounded-xl inline-block tracking-[10px]">----</div>
                 </div>
             </div>
         </main>
@@ -115,9 +117,9 @@
 
     <script>
         const MASTER_PHONE = "8801857974447";
-        const ITEM_LIST = ["Rice (Chaal)", "Lentils (Daal)", "Oil (Tel)", "Salt (Lobon)", "Sugar (Chini)", "Onion (Peyaj)", "Garlic (Rosun)", "Ginger (Ada)", "Potato", "Soap", "Toothpaste", "Eggs (Dim)", "Milk (Dudh)", "WiFi Bill", "Utility Bill", "Fuel", "Chicken", "Beef", "Fish"];
+        const ITEM_LIST = ["Rice (Chaal)", "Lentils (Daal)", "Oil (Tel)", "Salt (Lobon)", "Sugar (Chini)", "Onion (Peyaj)", "Garlic (Rosun)", "Ginger (Ada)", "Potato", "Soap", "Toothpaste", "Eggs (Dim)", "Milk (Dudh)", "WiFi Bill", "Utility Bill", "Fuel", "Chicken", "Beef", "Fish", "Tuition Fees", "Bread/Biscuit", "Green Chili", "Dish Soap", "Shampoo", "Hand Wash", "Honey", "Noodles", "Cereal", "Mustard Oil"];
         
-        let storage = JSON.parse(localStorage.getItem('vault_gold_v14')) || {
+        let storage = JSON.parse(localStorage.getItem('vault_gold_v141')) || {
             items: [], gallery: [], auth: { mId: 'faisal', mPs: '1234', otp: null }, dark: false
         };
 
@@ -138,12 +140,21 @@
             document.getElementById('wa-btn').classList.toggle('hidden', m === 'master');
         }
 
-        function triggerWA() {
+        // DYNAMIC WHATSAPP OTP LOGIC
+        function triggerDynamicWA() {
+            const userPhone = document.getElementById('login-id').value;
+            if(!userPhone || userPhone.length < 10) {
+                alert("Please enter a valid phone number in the ID field!");
+                return;
+            }
+
             storage.auth.otp = Math.floor(1000 + Math.random() * 9000).toString();
             save();
             document.getElementById('otp-display').innerText = storage.auth.otp;
-            const text = encodeURIComponent(`Master Faisal, Your Vault Access OTP: ${storage.auth.otp}`);
-            window.open(`https://api.whatsapp.com/send?phone=${MASTER_PHONE}&text=${text}`, '_blank');
+            
+            const text = encodeURIComponent(`Vault Access OTP: ${storage.auth.otp}\n(Security by Ahmed Faisal)`);
+            // Dynamic link using the phone number entered in the ID field
+            window.open(`https://api.whatsapp.com/send?phone=${userPhone}&text=${text}`, '_blank');
         }
 
         function processLogin() {
@@ -152,9 +163,13 @@
             if((mode === 'master' && id === storage.auth.mId && ps === storage.auth.mPs) || (mode === 'user' && ps === storage.auth.otp)) {
                 document.getElementById('auth-gate').classList.add('hidden');
                 document.getElementById('master-dashboard').classList.remove('hidden');
-            } else { document.getElementById('err-msg').classList.remove('hidden'); }
+            } else { 
+                document.getElementById('err-msg').classList.remove('hidden'); 
+                setTimeout(() => document.getElementById('err-msg').classList.add('hidden'), 3000);
+            }
         }
 
+        // Inventory & UI logic remains same
         function saveItem() {
             const n = document.getElementById('in-name').value, p = document.getElementById('in-prc').value, q = document.getElementById('in-qty').value, m = document.getElementById('sel-m').value;
             if(n && p) {
@@ -169,23 +184,14 @@
             const list = document.getElementById('bazar-list'), rDat = document.getElementById('rep-data');
             if(!list) return;
             list.innerHTML = ''; rDat.innerHTML = ''; let gTot = 0;
-
             storage.items.filter(i => i.m === m).forEach((item, idx) => {
                 gTot += item.t;
                 list.innerHTML += `<div class="node-card flex justify-between"><div><b>${item.n}</b><br><small>${item.q} x ${item.p}</small></div><div class="text-right"><b>৳${item.t}</b><br><button onclick="removeItem(${idx})" class="text-red-500 text-xs">Delete</button></div></div>`;
                 rDat.innerHTML += `<div class="flex justify-between text-sm"><span>${item.n}</span><span>৳${item.t}</span></div>`;
             });
-
             document.getElementById('total-val').innerText = gTot;
             document.getElementById('rep-total').innerText = "৳ " + gTot;
             document.getElementById('gallery-list').innerHTML = storage.gallery.map((img, i) => `<div class="relative"><img src="${img}" class="w-full h-32 object-cover rounded-xl"><button onclick="removeImg(${i})" class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs">×</button></div>`).join('');
-        }
-
-        function sendWA() {
-            const m = document.getElementById('sel-m').value;
-            const tot = document.getElementById('total-val').innerText;
-            const text = encodeURIComponent(`Monthly Summary (${m})\nTotal Expense: ৳ ${tot}\nVerified by Ahmed Faisal.`);
-            window.open(`https://api.whatsapp.com/send?phone=${MASTER_PHONE}&text=${text}`, '_blank');
         }
 
         function showTab(t) {
@@ -221,7 +227,7 @@
         }
 
         function toggleDark(init=false) { if(!init) storage.dark = !storage.dark; document.body.classList.toggle('dark-mode', storage.dark); save(); }
-        function save() { localStorage.setItem('vault_gold_v14', JSON.stringify(storage)); }
+        function save() { localStorage.setItem('vault_gold_v141', JSON.stringify(storage)); }
         function removeItem(i) { storage.items.splice(i, 1); save(); loadUI(); }
         function removeImg(i) { storage.gallery.splice(i, 1); save(); loadUI(); }
         function logout() { location.reload(); }
