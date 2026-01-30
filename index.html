@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Ahmed Faisal - Ultimate Gallery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0f172a; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="p-4 md:p-10">
+
+    <div class="text-center text-xs text-blue-400 mb-4 tracking-widest uppercase">Created by Ahmed Faisal</div>
+
+    <div id="login-section" class="max-w-md mx-auto mt-20 p-8 glass rounded-2xl shadow-2xl">
+        <h2 class="text-2xl font-bold mb-6 text-center">Welcome Master Faisal</h2>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm mb-1">Verify Identity (Favorite Hero?)</label>
+                <input type="text" id="hero-input" placeholder="Enter name..." class="w-full p-3 rounded bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500">
+            </div>
+            <button onclick="checkLogin()" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded-lg font-bold transition">Verify Identity</button>
+            <p id="error-msg" class="text-red-500 text-sm hidden text-center italic">Access Denied. Identity not confirmed.</p>
+        </div>
+    </div>
+
+    <div id="dashboard" class="hidden max-w-4xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">Infinite V 1.0 <span class="text-blue-500">Bazaar Portal</span></h1>
+            <button onclick="logout()" class="text-sm bg-red-900/30 px-4 py-2 rounded border border-red-500 text-red-400 hover:bg-red-500 hover:text-white transition">Logout</button>
+        </div>
+
+        <div class="glass p-6 rounded-xl mb-8">
+            <h3 class="text-lg font-bold mb-4 border-b border-slate-700 pb-2">Add New Item</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input type="text" id="item-name" placeholder="Item Name (e.g., Rice)" class="p-3 rounded bg-slate-800 border border-slate-700 focus:outline-none">
+                <input type="number" id="item-price" placeholder="Price (TK)" class="p-3 rounded bg-slate-800 border border-slate-700 focus:outline-none">
+                <button onclick="addItem()" class="bg-green-600 hover:bg-green-700 p-3 rounded-lg font-bold transition">Add to List</button>
+            </div>
+        </div>
+
+        <div class="glass p-6 rounded-xl overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="border-b border-slate-700 text-blue-400 uppercase text-sm">
+                        <th class="py-3 px-2">Item</th>
+                        <th class="py-3 px-2 text-right">Price (TK)</th>
+                    </tr>
+                </thead>
+                <tbody id="bazaar-list">
+                    </tbody>
+                <tfoot>
+                    <tr class="font-bold text-xl text-green-400">
+                        <td class="py-4 px-2 italic">Total Balance</td>
+                        <td class="py-4 px-2 text-right" id="total-amount">0 TK</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Data Handling
+        let items = JSON.parse(localStorage.getItem('faisal_bazaar_data')) || [];
+
+        function checkLogin() {
+            const answer = document.getElementById('hero-input').value.toLowerCase();
+            if (answer === "tony") {
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                renderItems();
+            } else {
+                document.getElementById('error-msg').classList.remove('hidden');
+            }
+        }
+
+        function addItem() {
+            const name = document.getElementById('item-name').value;
+            const price = document.getElementById('item-price').value;
+            if (name && price) {
+                items.push({ name, price: parseFloat(price) });
+                saveData();
+                renderItems();
+                document.getElementById('item-name').value = '';
+                document.getElementById('item-price').value = '';
+            }
+        }
+
+        function renderItems() {
+            const listBody = document.getElementById('bazaar-list');
+            listBody.innerHTML = '';
+            let total = 0;
+            items.forEach((item, index) => {
+                total += item.price;
+                listBody.innerHTML += `
+                    <tr class="border-b border-slate-800 hover:bg-white/5 transition">
+                        <td class="py-3 px-2">${item.name}</td>
+                        <td class="py-3 px-2 text-right">${item.price} TK</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('total-amount').innerText = total + ' TK';
+        }
+
+        function saveData() {
+            localStorage.setItem('faisal_bazaar_data', JSON.stringify(items));
+        }
+
+        function logout() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
